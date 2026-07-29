@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QEV Status, Versions &amp; Test Matrix</title>
+  <meta name="description" content="Single source of truth for QEV product hierarchy, versions, test counts by component, and capability labels. Generated for Gate A honesty." />
+  <link rel="canonical" href="https://secure.imagineqira.com/status/" />
+  <meta property="og:title" content="QEV Status &amp; Test Matrix" />
+  <meta property="og:url" content="https://secure.imagineqira.com/status/" />
+  <meta name="robots" content="index,follow" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "QEV Status and Test Matrix",
+    "url": "https://secure.imagineqira.com/status/",
+    "dateModified": "2026-07-29",
+    "isPartOf": {"@type":"WebSite","name":"QEV","url":"https://secure.imagineqira.com/"}
+  }
+  </script>
+  <style>
+    body{font-family:system-ui,sans-serif;max-width:860px;margin:2rem auto;padding:0 1rem;line-height:1.5;color:#0f1419}
+    table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0}
+    th,td{border:1px solid #d0d7de;padding:.5rem .6rem;text-align:left;vertical-align:top}
+    th{background:#f4f6f8}
+    .a{background:#e8f8ef}.p{background:#fff6e0}.x{background:#fdecea}.pl{background:#eef2f6}
+    code{background:#f0f2f5;padding:.1rem .35rem;border-radius:4px;font-size:.85em}
+    a{color:#0b6bcb}
+    .note{background:#f6f8fa;border-left:4px solid #0969da;padding:.75rem 1rem;margin:1rem 0}
+  </style>
+</head>
+<body>
+  <nav><a href="/">QEV</a> · Status · <a href="/platform/">Platform</a> · <a href="/trust/">Trust</a></nav>
+  <h1>QEV status, versions &amp; test matrix</h1>
+  <p><strong>Last updated:</strong> 2026-07-29 · <strong>Purpose:</strong> one place for versions and test counts so marketing pages never invent numbers.</p>
+
+  <div class="note">
+    <strong>Product hierarchy (one stack)</strong><br>
+    <strong>1. Envelope Core</strong> — portable Vault V2 (browser, desktop, CLI)<br>
+    <strong>2. Capture Gateway</strong> — customer-controlled event → package pipeline<br>
+    <strong>3. Connectors</strong> — webhook, portal, photo/file, file-watch (more planned)<br>
+    <strong>4. Flow Packs</strong> — Field Service (pilot); AI/legal/devops packs planned<br>
+    <strong>5. Verify</strong> — multi-verdict package review + seal certificates<br>
+    <strong>6. Control Plane</strong> — optional; not required for local pilot · no customer plaintext
+  </div>
+
+  <h2>Capability labels</h2>
+  <table>
+    <thead><tr><th>Label</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="a"><strong>Available</strong></td><td>Works today on a public or pilot surface</td></tr>
+      <tr><td class="p"><strong>Preview</strong></td><td>Controlled-use; limited trust model; not enterprise-hardened</td></tr>
+      <tr><td class="pl"><strong>Planned</strong></td><td>Designed / scaffolded; not ready for production claims</td></tr>
+      <tr><td class="x"><strong>Not assessed</strong></td><td>No independent third-party security audit completed</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Component matrix</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Component</th>
+        <th>Version</th>
+        <th>Status</th>
+        <th>Tests (source)</th>
+        <th>Vault V2</th>
+        <th>Evidence Bundle V1</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Product preview demo (site /app history)</td>
+        <td>0.29.0</td>
+        <td class="p">Preview</td>
+        <td><strong>258</strong> (220 product + 38 vault-tool) — as published on main product page</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>Desktop / mobile apps (downloads)</td>
+        <td>0.29.0</td>
+        <td class="p">Preview · unsigned installers</td>
+        <td><strong>362</strong> — download-page claim for that binary pipeline; different suite from the 258 product tests</td>
+        <td class="a">R/W</td>
+        <td class="pl">Planned open</td>
+      </tr>
+      <tr>
+        <td>CLI npm package</td>
+        <td>0.30.0</td>
+        <td class="a">Available</td>
+        <td>Built-in <code>qev self-test</code> + package <code>node --test</code> suite (historically documented as ~26 cases — not the same as 258/362)</td>
+        <td class="a">R/W</td>
+        <td class="pl">Planned</td>
+      </tr>
+      <tr>
+        <td>Browser vault <code>/vault</code></td>
+        <td>0.29.x / V2 format</td>
+        <td class="a">Available</td>
+        <td>Included in vault-tool portion of product testing; crypto self-test in page</td>
+        <td class="a">R/W</td>
+        <td class="x">No</td>
+      </tr>
+      <tr>
+        <td>qev-platform gateway</td>
+        <td>0.3.x pilot</td>
+        <td class="p">Preview pilot</td>
+        <td>Monorepo Vitest (packages + gateway) — run <code>pnpm test</code> in <a href="https://github.com/TheArtOfSound/qev-platform">qev-platform</a>; count is CI-generated, not hand-edited on marketing pages</td>
+        <td class="a">Seals via V2</td>
+        <td class="a">Write/verify</td>
+      </tr>
+      <tr>
+        <td>Qira Link</td>
+        <td>0.1.0-alpha</td>
+        <td class="pl">Sibling alpha</td>
+        <td>Separate product — not counted in QEV product 258</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Why test counts differ</h2>
+  <p>They are <strong>different codebases and suites</strong>, not “failed tests missing from the homepage.”</p>
+  <ul>
+    <li><strong>258</strong> — product preview / policy-demo path (as stated on the main site).</li>
+    <li><strong>362</strong> — desktop binary pipeline claim on the downloads page.</li>
+    <li><strong>CLI self-test</strong> — small focused suite for the npm package only.</li>
+    <li><strong>qev-platform</strong> — separate Vitest monorepo for the commercial gateway.</li>
+  </ul>
+  <p>Never mix these numbers into one “QEV has N tests” claim without naming the component.</p>
+
+  <h2>Official package names (today)</h2>
+  <table>
+    <thead><tr><th>Package</th><th>Name</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>CLI (published)</td>
+        <td><code>@bryan237l/qev-cli</code></td>
+        <td>Install: <code>npm i -g @bryan237l/qev-cli</code> · v0.30.0 on npm</td>
+      </tr>
+      <tr>
+        <td>Platform monorepo packages</td>
+        <td><code>@imagineqira/qev-*</code></td>
+        <td>Workspace packages in GitHub; not all published to npm yet</td>
+      </tr>
+      <tr>
+        <td>Future brand alignment</td>
+        <td><code>@imagineqira/qev-cli</code></td>
+        <td><strong>Planned</strong> rename/publish; until then use <code>@bryan237l/qev-cli</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>What is live on this host</h2>
+  <ul>
+    <li><a href="/vault">Envelope Core (browser vault)</a> — Available</li>
+    <li><a href="/platform/">Capture Gateway pilot</a> — Preview</li>
+    <li><a href="/field-service-evidence/">Field Service flow docs</a> — Preview</li>
+    <li><a href="/trust/">Trust program</a> — Compatible / Pilot certs only; no Protected badge</li>
+    <li><a href="/audit-status/">Audit status</a> — Not independently assessed</li>
+    <li><a href="/verify">Site integrity</a> — Ed25519-signed manifest</li>
+  </ul>
+
+  <h2>What is not claimed</h2>
+  <ul>
+    <li>Not production-ready multi-tenant SaaS</li>
+    <li>No formal third-party security audit</li>
+    <li>No KMS/HSM · no formal key rotation/revocation</li>
+    <li>Installers not Apple-notarized / Authenticode-signed yet</li>
+    <li>No “QEV Protected Workflow” public badge yet</li>
+  </ul>
+
+  <p style="margin-top:2rem;font-size:.9rem;color:#556">
+    Source of this page: <a href="https://github.com/TheArtOfSound/qev-platform">qev-platform</a> ·
+    Gate A honesty · Update when versions change · Do not hand-edit counts on marketing pages without updating this matrix.
+  </p>
+</body>
+</html>
