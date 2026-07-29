@@ -19,6 +19,21 @@
 
 ---
 
+## Release gates (audit package — authoritative sequence)
+
+Source: `docs/audit/QEV_Release_Gates.md` + 28 findings + 136 test cases.
+
+| Gate | Before… | Status |
+|---|---|---|
+| **A** Public preview honesty | Further promotion | IN PROGRESS |
+| **B** Synthetic platform | Historical AH Crap data | PARTIAL (gateway live) |
+| **C** Historical-data test | Shadow mode | PARTIAL (template/import) |
+| **D** Live shadow mode | Automatic sealing | NOT STARTED |
+| **E** Limited live automation | Gate mode / outside customers | NOT READY |
+| **F** QEV Protected Workflow badge | Public Protected mark | BLOCKED (correct) |
+
+**Do not put live AH Crap customer data into commercial capture until Gate D+ and external review path are clear.**
+
 ## Rank tiers
 
 | Rank | Meaning |
