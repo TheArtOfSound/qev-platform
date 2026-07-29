@@ -87,8 +87,8 @@ pnpm --filter @imagineqira/qev-event-schema build
 pnpm --filter @imagineqira/qev-policy-engine build
 pnpm --filter @imagineqira/qev-evidence-bundle build
 pnpm --filter @imagineqira/qev-runtime build
-pnpm --filter @imagineqira/qev-ops build
 pnpm --filter @imagineqira/qev-trust build
+pnpm --filter @imagineqira/qev-ops build
 pnpm --filter @imagineqira/qev-sdk build
 pnpm --filter @imagineqira/qev-connector-sdk build
 pnpm --filter @imagineqira/qev-gateway build
@@ -198,6 +198,8 @@ else:
   print("nginx platform location already present")
 PY
 fi
+# sites-enabled may be a separate copy (not a symlink) on this host
+sudo cp /etc/nginx/sites-available/secure.imagineqira.com /etc/nginx/sites-enabled/secure.imagineqira.com
 sudo nginx -t
 sudo systemctl reload nginx
 REMOTE
