@@ -1,0 +1,354 @@
+{
+  "imported_at": "2026-07-29T21:35:20.166Z",
+  "meta": {
+    "case_id": "JOB-HIST-001",
+    "title": "Water heater replacement (synthetic-historical template)",
+    "customer_label": "Customer A",
+    "notes": "Template job — replace files and dates with redacted real archive when ready.",
+    "actions": [
+      {
+        "action": "job.created",
+        "at": "2026-03-01T14:00:00.000Z",
+        "actor": "office@redacted.local",
+        "payload": {
+          "service": "water_heater",
+          "customer_label": "Customer A"
+        }
+      },
+      {
+        "action": "estimate.prepared",
+        "at": "2026-03-01T15:30:00.000Z",
+        "actor": "office@redacted.local",
+        "payload": {
+          "amount_range": "1500-2000"
+        }
+      },
+      {
+        "action": "estimate.approved",
+        "at": "2026-03-02T10:00:00.000Z",
+        "actor": "customer-a@redacted.local"
+      },
+      {
+        "action": "evidence.before_captured",
+        "at": "2026-03-05T09:00:00.000Z",
+        "actor": "tech@redacted.local",
+        "file": "files/before-1.txt"
+      },
+      {
+        "action": "work.started",
+        "at": "2026-03-05T09:15:00.000Z",
+        "actor": "tech@redacted.local"
+      },
+      {
+        "action": "work.completed",
+        "at": "2026-03-05T16:00:00.000Z",
+        "actor": "tech@redacted.local"
+      },
+      {
+        "action": "evidence.after_captured",
+        "at": "2026-03-05T16:10:00.000Z",
+        "actor": "tech@redacted.local",
+        "file": "files/after-1.txt"
+      },
+      {
+        "action": "invoice.issued",
+        "at": "2026-03-06T09:00:00.000Z",
+        "actor": "office@redacted.local",
+        "file": "files/invoice.txt"
+      }
+    ],
+    "questions_for_reviewer": [
+      "Can you explain the job without calling the office?",
+      "Is anything missing that would matter in a disagreement?",
+      "Is anything still too identifiable?"
+    ]
+  },
+  "completeness": {
+    "flow_id": "field-service",
+    "case_id": "JOB-HIST-001",
+    "required_total": 5,
+    "required_present": 5,
+    "required_missing": [],
+    "optional_present": [
+      "estimate.prepared",
+      "work.started"
+    ],
+    "optional_missing": [
+      "scope.changed",
+      "change.approved",
+      "invoice.issued",
+      "payment.recorded",
+      "customer.completion_confirmed"
+    ],
+    "complete_for_seal": true,
+    "seal_allowed_in_shadow": true,
+    "percent": 100,
+    "messages": [
+      "All required flow actions are present."
+    ]
+  },
+  "sealed": {
+    "package_id": "pkg_3988df965ec29ba8e8077e30ca4606a3",
+    "case_id": "JOB-HIST-001",
+    "flow_id": "field-service",
+    "path": "/Users/bry/Projects/qev-platform/data/packages/pkg_3988df965ec29ba8e8077e30ca4606a3.qevpkg.json",
+    "integrity": {
+      "events_sha256": "13e7b65a7ad7010f1d5bfa180f7b632ec16e2b9d01d713446bb9959026099cd3",
+      "bundle_sha256": "3c238f7a0b1d968ee6201d864cf26bfa0eaabd669d2964b8a389471aabd88721",
+      "algorithm": "SHA-256"
+    },
+    "public_meta": {
+      "title": "field-service JOB-HIST-001",
+      "event_count": 8,
+      "outcome": "complete",
+      "integrity_events_sha256": "13e7b65a7ad7010f1d5bfa180f7b632ec16e2b9d01d713446bb9959026099cd3"
+    },
+    "package_signature": {
+      "algorithm": "Ed25519",
+      "key_id": "org_HQdPf1GMSCXS",
+      "signed_at": "2026-07-29T21:35:19.668Z"
+    },
+    "verification_claims": [
+      "schema is QEV-EVIDENCE-BUNDLE-V1",
+      "events content matches integrity.events_sha256",
+      "bundle content matches integrity.bundle_sha256",
+      "artifact before-1.txt has a well-formed sha256 fingerprint",
+      "artifact after-1.txt has a well-formed sha256 fingerprint",
+      "artifact invoice.txt has a well-formed sha256 fingerprint"
+    ],
+    "completeness": {
+      "flow_id": "field-service",
+      "case_id": "JOB-HIST-001",
+      "required_total": 5,
+      "required_present": 5,
+      "required_missing": [],
+      "optional_present": [
+        "estimate.prepared",
+        "work.started"
+      ],
+      "optional_missing": [
+        "scope.changed",
+        "change.approved",
+        "invoice.issued",
+        "payment.recorded",
+        "customer.completion_confirmed"
+      ],
+      "complete_for_seal": true,
+      "seal_allowed_in_shadow": true,
+      "percent": 100,
+      "messages": [
+        "All required flow actions are present."
+      ]
+    },
+    "mode": "shadow",
+    "mode_behavior": {
+      "mode": "shadow",
+      "records_events": true,
+      "controls_workflow": false,
+      "can_block_actions": false,
+      "description": "Automatic capture alongside normal ops; business process remains source of truth.",
+      "human_confirm_to_enable": false
+    },
+    "shadow_mode": true,
+    "note": "Sealed packages are immutable. Late events require a supplemental package (P1)."
+  },
+  "verification": {
+    "package_id": "pkg_3988df965ec29ba8e8077e30ca4606a3",
+    "vault_sha256_ok": true,
+    "decrypt_ok": true,
+    "vault_schema": "BRY-NFET-SX-VAULT-V2",
+    "package_signer": {
+      "ok": true,
+      "detail": "Ed25519 signature valid for key_id org_HQdPf1GMSCXS",
+      "level": "verified"
+    },
+    "bundle": {
+      "schema_ok": true,
+      "events_hash_ok": true,
+      "bundle_hash_ok": true,
+      "known_gaps": 0,
+      "event_count": 8,
+      "claims": [
+        "schema is QEV-EVIDENCE-BUNDLE-V1",
+        "events content matches integrity.events_sha256",
+        "bundle content matches integrity.bundle_sha256",
+        "artifact before-1.txt has a well-formed sha256 fingerprint",
+        "artifact after-1.txt has a well-formed sha256 fingerprint",
+        "artifact invoice.txt has a well-formed sha256 fingerprint"
+      ],
+      "failures": [],
+      "overall_ok": true
+    },
+    "multi_verdict": {
+      "package_id": "pkg_3988df965ec29ba8e8077e30ca4606a3",
+      "case_id": "JOB-HIST-001",
+      "flow_id": "field-service",
+      "lines": [
+        {
+          "id": "package_integrity",
+          "label": "Package integrity",
+          "level": "verified",
+          "detail": "Outer vault_sha256 and evidence digests match recorded values"
+        },
+        {
+          "id": "package_signer",
+          "label": "Package signer",
+          "level": "verified",
+          "detail": "Ed25519 signature valid for key_id org_HQdPf1GMSCXS"
+        },
+        {
+          "id": "source_webhook",
+          "label": "Source webhook",
+          "level": "not_applicable",
+          "detail": "No webhook-ingested events in this package"
+        },
+        {
+          "id": "actor_identity",
+          "label": "Actor identity",
+          "level": "partial",
+          "detail": "Strongest recorded: source_asserted"
+        },
+        {
+          "id": "artifact_match",
+          "label": "Artifact fingerprints",
+          "level": "verified",
+          "detail": "3/3 well-formed SHA-256 fingerprints (content truth not re-fetched)"
+        },
+        {
+          "id": "time",
+          "label": "Time",
+          "level": "partial",
+          "detail": "Gateway observed and/or source system time only"
+        },
+        {
+          "id": "external_time_anchor",
+          "label": "External time anchor",
+          "level": "not_present",
+          "detail": "Not present (optional for pilot)"
+        },
+        {
+          "id": "required_evidence",
+          "label": "Required evidence",
+          "level": "verified",
+          "detail": "5 of 5 required actions present"
+        },
+        {
+          "id": "content_truth",
+          "label": "Content truth",
+          "level": "not_determined",
+          "detail": "QEV does not independently determine whether source content is true"
+        },
+        {
+          "id": "post_seal",
+          "label": "Post-seal rewrite",
+          "level": "verified",
+          "detail": "Sealed packages are immutable; late events must open a new package or known gap"
+        },
+        {
+          "id": "shadow_mode",
+          "label": "Shadow mode",
+          "level": "partial",
+          "detail": "Recording only — QEV did not control or block the business process"
+        }
+      ],
+      "required_evidence": {
+        "have": 5,
+        "need": 5,
+        "missing": []
+      },
+      "known_gaps": [],
+      "timeline": [
+        {
+          "at": "2026-03-01T14:00:00.000Z",
+          "action": "job.created",
+          "actor": "office@redacted.local",
+          "source": "qev-job-portal / job-portal",
+          "event_id": "portal_6087f0af875ad0332cf1ecab4d3b9a62"
+        },
+        {
+          "at": "2026-03-01T15:30:00.000Z",
+          "action": "estimate.prepared",
+          "actor": "office@redacted.local",
+          "source": "qev-job-portal / job-portal",
+          "event_id": "portal_61795335cef1f97080aa27421afa8c88"
+        },
+        {
+          "at": "2026-03-02T10:00:00.000Z",
+          "action": "estimate.approved",
+          "actor": "customer-a@redacted.local",
+          "source": "qev-job-portal / job-portal",
+          "event_id": "portal_5eced64d619b904e0092b93e6b1c3ea6"
+        },
+        {
+          "at": "2026-03-05T09:15:00.000Z",
+          "action": "work.started",
+          "actor": "tech@redacted.local",
+          "source": "qev-job-portal / job-portal",
+          "event_id": "portal_d922023805b0c5dc9a30ccf53500b736"
+        },
+        {
+          "at": "2026-03-05T16:00:00.000Z",
+          "action": "work.completed",
+          "actor": "tech@redacted.local",
+          "source": "qev-job-portal / job-portal",
+          "event_id": "portal_4dbedde3005a0ff7d96bcfa1f0ca2601"
+        },
+        {
+          "at": "2026-07-29T21:35:19.118Z",
+          "action": "evidence.before_captured",
+          "actor": "tech@redacted.local",
+          "source": "photo-file / photo-file",
+          "event_id": "photo_3085543f3e9a8bf9a8e62ed0a34a2af1"
+        },
+        {
+          "at": "2026-07-29T21:35:19.134Z",
+          "action": "evidence.after_captured",
+          "actor": "tech@redacted.local",
+          "source": "photo-file / photo-file",
+          "event_id": "photo_7fc74b9dfd0fbcc965c8721721553e6e"
+        },
+        {
+          "at": "2026-07-29T21:35:19.140Z",
+          "action": "evidence.file_captured",
+          "actor": "office@redacted.local",
+          "source": "photo-file / photo-file",
+          "event_id": "photo_aaaa58b38a3b1cc266f4f73954c1d12c"
+        }
+      ],
+      "content_truth": "not_independently_determined",
+      "shadow_mode": true,
+      "overall_safe_to_rely_for": [
+        "Whether sealed package bytes match integrity digests",
+        "Whether decrypt succeeded with authorized unlock",
+        "Which events and artifact hashes were recorded",
+        "Which required flow steps are present or missing"
+      ],
+      "overall_not_safe_to_rely_for": [
+        "Truth of statements inside source systems",
+        "Legal privilege or court admissibility",
+        "That unlogged actions never occurred",
+        "Identity stronger than recorded identity_assurance"
+      ]
+    },
+    "claims": [
+      "Package integrity: Outer vault_sha256 and evidence digests match recorded values",
+      "Package signer: Ed25519 signature valid for key_id org_HQdPf1GMSCXS",
+      "Artifact fingerprints: 3/3 well-formed SHA-256 fingerprints (content truth not re-fetched)",
+      "Required evidence: 5 of 5 required actions present",
+      "Post-seal rewrite: Sealed packages are immutable; late events must open a new package or known gap"
+    ],
+    "failures": [],
+    "overall_ok": true,
+    "does_not_prove": [
+      "Truth of statements inside source systems",
+      "Legal privilege or court admissibility",
+      "That unlogged actions never occurred",
+      "Identity stronger than recorded identity_assurance"
+    ]
+  },
+  "reviewer_questions": [
+    "Can you explain the job without calling the office?",
+    "Is anything missing that would matter in a disagreement?",
+    "Is anything still too identifiable?"
+  ]
+}

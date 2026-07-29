@@ -1,0 +1,63 @@
+# QEV Flow Pack — Production / DevOps Change Evidence
+id: devops-change
+version: 0.1.0
+title: Production Change Evidence
+status: mvp
+description: >
+  Capture change request, actor, commit/deploy artifacts, policy decisions,
+  and outcome into a sealed QEV evidence package.
+
+connectors:
+  - generic-webhook
+  - sdk-js
+  # planned: github, otlp, file-watch
+
+identity:
+  preferred: company_sso
+  accepted:
+    - company_sso
+    - source_asserted
+    - cryptographically_signed
+
+events_required:
+  - change.requested
+  - deployment.completed
+optional_events:
+  - tests.passed
+  - approval.granted
+  - backup.verified
+  - rollback.executed
+
+artifact_rules:
+  - fingerprint: sha256
+  - include: [build artifacts, reviewed diff, deploy plan]
+  - note: Missing fingerprints are recorded as known_gaps, not hidden.
+
+privacy:
+  default_mode: full
+  field_modes:
+    secrets: drop
+    env_vars: hash_only
+
+approval:
+  production_deploy: require_approval
+  infra_destroy: block_unless_backup
+
+completion_rule: >
+  At least one terminal outcome event (deployment.completed, blocked, or failed)
+  for the case_id. Operator may call POST /v1/flows/devops-change/complete.
+
+recipients:
+  - role: operator
+  - role: auditor
+
+review_questions:
+  - Who initiated the change?
+  - What action was performed?
+  - What artifacts were fingerprinted?
+  - What policy effect applied?
+  - What was the outcome?
+
+claims_boundary: >
+  Package establishes integrity of recorded events under stated trust model.
+  Does not prove software correctness or that unlogged actions never occurred.

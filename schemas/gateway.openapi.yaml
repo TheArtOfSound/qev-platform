@@ -1,0 +1,224 @@
+openapi: 3.1.0
+info:
+  title: QEV Capture Gateway API
+  version: 0.1.0
+  description: |
+    Customer-controlled QEV gateway. Plaintext and package keys stay in the
+    customer environment. Optional Qira control plane must not receive
+    customer documents, prompts, or encryption keys.
+servers:
+  - url: https://qev-gateway.internal:7443
+    description: Customer VPC / appliance
+paths:
+  /healthz:
+    get:
+      summary: Liveness
+      responses:
+        "200":
+          description: OK
+  /readyz:
+    get:
+      summary: Readiness (storage writable)
+      responses:
+        "200":
+          description: Ready
+        "503":
+          description: Not ready
+  /v1/events:
+    post:
+      summary: Ingest one normalized or raw-connector event
+      security:
+        - IngestToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IngestEventRequest"
+      responses:
+        "202":
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngestReceipt"
+        "401":
+          description: Unauthorized
+        "400":
+          description: Invalid event
+  /v1/webhooks/{connector_id}:
+    post:
+      summary: Signed webhook ingress
+      parameters:
+        - name: connector_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: X-QEV-Signature
+          in: header
+          required: true
+          schema:
+            type: string
+            description: "sha256=<hex hmac of raw body>"
+        - name: X-QEV-Timestamp
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        "202":
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngestReceipt"
+        "401":
+          description: Bad signature
+  /v1/flows/{flow_id}/complete:
+    post:
+      summary: Seal a case into an evidence package
+      security:
+        - IngestToken: []
+      parameters:
+        - name: flow_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [case_id]
+              properties:
+                case_id:
+                  type: string
+                passphrase:
+                  type: string
+                  description: Unlock passphrase for local package (dev/MVP)
+      responses:
+        "201":
+          description: Package created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PackageSummary"
+  /v1/packages/{package_id}:
+    get:
+      summary: Get package metadata (not plaintext)
+      parameters:
+        - name: package_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Metadata
+        "404":
+          description: Not found
+  /v1/packages/{package_id}/verify:
+    post:
+      summary: Verify encrypted package integrity and decrypt check
+      parameters:
+        - name: package_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [passphrase]
+              properties:
+                passphrase:
+                  type: string
+      responses:
+        "200":
+          description: Verification report
+  /v1/policy/evaluate:
+    post:
+      summary: Evaluate policy without sealing
+      security:
+        - IngestToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Decision
+  /v1/receipts/{event_id}:
+    get:
+      summary: Ingest receipt
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Receipt
+        "404":
+          description: Not found
+components:
+  securitySchemes:
+    IngestToken:
+      type: http
+      scheme: bearer
+  schemas:
+    IngestEventRequest:
+      type: object
+      required: [event]
+      properties:
+        event:
+          description: qev.event.v1 object
+          type: object
+        seal_if_complete:
+          type: boolean
+          default: false
+    IngestReceipt:
+      type: object
+      required: [event_id, status, observed_at]
+      properties:
+        event_id:
+          type: string
+        status:
+          type: string
+          enum: [accepted, duplicate, blocked]
+        observed_at:
+          type: string
+          format: date-time
+        policy_effect:
+          type: string
+        package_id:
+          type: string
+    PackageSummary:
+      type: object
+      properties:
+        package_id:
+          type: string
+        case_id:
+          type: string
+        flow_id:
+          type: string
+        path:
+          type: string
+        integrity:
+          type: object

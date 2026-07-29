@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://imagineqira.com/schemas/qev.event.v1.schema.json",
+  "title": "qev.event.v1",
+  "description": "Canonical QEV event after connector normalization. Freeze carefully — connectors depend on this contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "event_id",
+    "occurred_at",
+    "observed_at",
+    "tenant_id",
+    "flow_id",
+    "case_id",
+    "source",
+    "actor",
+    "action",
+    "outcome",
+    "privacy"
+  ],
+  "properties": {
+    "schema": {
+      "const": "qev.event.v1"
+    },
+    "event_id": {
+      "type": "string",
+      "minLength": 8,
+      "description": "Globally unique event id (UUID or connector-stable id)."
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the source system says the action happened."
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the QEV gateway received/normalized the event."
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "flow_id": {
+      "type": "string",
+      "description": "Flow pack id, e.g. devops-change."
+    },
+    "case_id": {
+      "type": "string",
+      "description": "Matter, deployment, agent run, investigation, or change ticket id."
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["system", "connector", "connector_version"],
+      "properties": {
+        "system": { "type": "string" },
+        "connector": { "type": "string" },
+        "connector_version": { "type": "string" },
+        "provider_event_id": { "type": "string" },
+        "raw_body_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "ingestion_path": {
+          "type": "string",
+          "enum": ["webhook", "otlp", "sdk", "poll", "file", "proxy"]
+        }
+      }
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "identity_assurance"],
+      "properties": {
+        "id": { "type": "string" },
+        "display_name": { "type": "string" },
+        "identity_assurance": {
+          "type": "string",
+          "enum": [
+            "typed",
+            "source_asserted",
+            "company_sso",
+            "cryptographically_signed",
+            "device_bound"
+          ]
+        },
+        "auth_context": { "type": "string" }
+      }
+    },
+    "action": {
+      "type": "string",
+      "description": "Normalized action name, e.g. deployment.completed."
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "type": { "type": "string" },
+        "id": { "type": "string" },
+        "name": { "type": "string" }
+      }
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["success", "failure", "pending", "blocked", "unknown"]
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "sha256"],
+        "properties": {
+          "name": { "type": "string" },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "media_type": { "type": "string" },
+          "size_bytes": { "type": "integer", "minimum": 0 },
+          "uri": { "type": "string" }
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "policy_id": { "type": "string" },
+        "policy_version": { "type": "string" },
+        "effect": {
+          "type": "string",
+          "enum": ["allow", "allow_and_record", "require_approval", "block"]
+        },
+        "reason": { "type": "string" }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default_mode"],
+      "properties": {
+        "default_mode": {
+          "type": "string",
+          "enum": ["full", "redacted", "hash_only", "reference_only", "drop"]
+        },
+        "field_modes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "enum": ["full", "redacted", "hash_only", "reference_only", "drop"]
+          }
+        }
+      }
+    },
+    "payload": {
+      "type": "object",
+      "description": "Normalized fields after privacy transforms.",
+      "additionalProperties": true
+    },
+    "known_gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" },
+          "severity": { "type": "string" }
+        }
+      }
+    },
+    "time_assurance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source_system_time": { "type": "string", "format": "date-time" },
+        "gateway_receipt_time": { "type": "string", "format": "date-time" },
+        "org_signed_time": { "type": "string", "format": "date-time" },
+        "independent_timestamp": { "type": "string", "format": "date-time" }
+      }
+    },
+    "connector_signature": {
+      "type": "object",
+      "description": "Optional connector signature over the normalized event.",
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": { "type": "string" },
+        "key_id": { "type": "string" },
+        "signature": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QEV Job Portal</title>
+  <link rel="stylesheet" href="assets/app.css" />
+</head>
+<body>
+  <header class="top">
+    <div>
+      <a href="./" class="back">← Home</a>
+      <h1>Job portal</h1>
+      <p class="sub">Field Service lifecycle · Universal connector surface</p>
+    </div>
+  </header>
+
+  <main class="split">
+    <section class="panel">
+      <h2>Job / case</h2>
+      <label>Job ID <input id="case_id" placeholder="JOB-2026-001" /></label>
+      <label>Actor email <input id="actor" placeholder="customer@example.com" value="customer@example.com" /></label>
+      <label>Action
+        <select id="action">
+          <option>job.created</option>
+          <option>estimate.prepared</option>
+          <option>estimate.approved</option>
+          <option>work.started</option>
+          <option>scope.changed</option>
+          <option>change.approved</option>
+          <option>work.completed</option>
+          <option>invoice.issued</option>
+          <option>payment.recorded</option>
+          <option>customer.completion_confirmed</option>
+        </select>
+      </label>
+      <label>Notes <textarea id="notes" rows="2" placeholder="Optional payload note"></textarea></label>
+      <button type="button" id="send-event" class="primary">Record event</button>
+      <p class="hint">Required for seal: job.created, estimate.approved, before + after photos, work.completed</p>
+    </section>
+
+    <section class="panel" id="photos">
+      <h2>Photos &amp; files</h2>
+      <label>Kind
+        <select id="photo-kind">
+          <option value="before">Before evidence</option>
+          <option value="after">After evidence</option>
+          <option value="receipt">Receipt</option>
+          <option value="other">Other file</option>
+        </select>
+      </label>
+      <label>File <input type="file" id="file" /></label>
+      <button type="button" id="upload" class="primary">Upload &amp; fingerprint</button>
+    </section>
+
+    <section class="panel">
+      <h2>Seal package</h2>
+      <label>Passphrase <input id="pass" type="password" value="change-me-for-local-dev-only" /></label>
+      <button type="button" id="seal" class="primary">Seal field-service package</button>
+      <p class="hint">Incomplete packages seal with known_gaps (shadow mode). Gate mode comes later.</p>
+    </section>
+  </main>
+
+  <section class="panel">
+    <h2>Output</h2>
+    <pre id="out">Ready.</pre>
+  </section>
+  <script type="module" src="assets/portal.js"></script>
+</body>
+</html>

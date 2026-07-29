@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QEV Gateway — Pilot</title>
+  <link rel="stylesheet" href="assets/app.css" />
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>QEV Capture Gateway</h1>
+      <p class="sub">Customer-controlled · Pilot 0.2 · Field Service first</p>
+    </div>
+    <span id="mode-badge" class="badge">…</span>
+  </header>
+
+  <main class="grid">
+    <a class="card" href="wizard">
+      <h2>1. Setup wizard</h2>
+      <p>Choose Field Service flow, privacy, unlock, connectors. No YAML.</p>
+    </a>
+    <a class="card" href="portal">
+      <h2>2. Job portal</h2>
+      <p>Create jobs, approvals, lifecycle events for a case.</p>
+    </a>
+    <a class="card" href="portal#photos">
+      <h2>3. Photos &amp; files</h2>
+      <p>Upload before/after evidence with SHA-256 fingerprints.</p>
+    </a>
+    <a class="card" href="review">
+      <h2>4. Review packages</h2>
+      <p>Multi-verdict verification — not a single green badge.</p>
+    </a>
+  </main>
+
+  <section class="panel">
+    <h2>Health &amp; preflight</h2>
+    <p class="hint">Seamless-Use Spec: activation blocked on critical preflight failures. Package signer uses local Ed25519 org key.</p>
+    <pre id="status">Loading…</pre>
+  </section>
+
+
+  <footer>
+    <p>
+      AH Crap (or any contractor) is a <strong>deployment</strong> of this platform —
+      not where architecture is invented. Stages: synthetic → historical → shadow → live.
+    </p>
+  </footer>
+  <script type="module" src="assets/home.js"></script>
+</body>
+</html>

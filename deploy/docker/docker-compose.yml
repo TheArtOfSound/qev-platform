@@ -1,0 +1,33 @@
+# QEV Gateway — customer-controlled local appliance (MVP)
+# Usage:
+#   cd deploy/docker && docker compose up --build
+# Then:
+#   open http://127.0.0.1:7443/healthz
+#   pnpm demo:vertical  (from repo root with gateway running)
+
+services:
+  qev-gateway:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+    ports:
+      - "7443:7443"
+    environment:
+      QEV_HOST: "0.0.0.0"
+      QEV_PORT: "7443"
+      QEV_STORAGE_DIR: "/data/packages"
+      QEV_WEBHOOK_SECRET: "${QEV_WEBHOOK_SECRET:-dev-webhook-secret-change-me}"
+      QEV_INGEST_TOKEN: "${QEV_INGEST_TOKEN:-dev-ingest-token-change-me}"
+      QEV_PACKAGE_PASSPHRASE: "${QEV_PACKAGE_PASSPHRASE:-change-me-for-local-dev-only}"
+      QEV_TENANT_ID: "${QEV_TENANT_ID:-local-dev}"
+    volumes:
+      - qev_packages:/data/packages
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:7443/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  qev_packages:

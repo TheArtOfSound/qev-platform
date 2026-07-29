@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QEV Package Review</title>
+  <link rel="stylesheet" href="assets/app.css" />
+</head>
+<body>
+  <header class="top">
+    <div>
+      <a href="./" class="back">← Home</a>
+      <h1>Package review</h1>
+      <p class="sub">Multi-verdict · Exact claims · Known gaps</p>
+    </div>
+  </header>
+
+  <main class="split">
+    <section class="panel">
+      <h2>Open package</h2>
+      <label>Package
+        <select id="pkg"></select>
+      </label>
+      <label>Passphrase <input id="pass" type="password" value="change-me-for-local-dev-only" /></label>
+      <button type="button" id="verify" class="primary">Decrypt &amp; verify</button>
+      <button type="button" id="refresh" class="ghost">Refresh list</button>
+    </section>
+    <section class="panel">
+      <h2>Verdicts</h2>
+      <div id="verdicts" class="verdicts">Select a package.</div>
+    </section>
+  </main>
+
+  <section class="panel">
+    <h2>Timeline</h2>
+    <div id="timeline"></div>
+  </section>
+  <section class="panel">
+    <h2>What this does / does not establish</h2>
+    <div id="rely"></div>
+  </section>
+  <script type="module" src="assets/review.js"></script>
+</body>
+</html>

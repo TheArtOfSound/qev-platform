@@ -1,0 +1,17 @@
+id: ai-agent
+version: 0.0.1
+title: AI Agent Evidence
+status: planned
+description: Capture agent runs, tool calls, approvals, and outputs with privacy modes.
+connectors_planned:
+  - sdk-js
+  - sdk-python
+  - otlp
+  - openai-agents
+  - aws-bedrock
+  - microsoft-graph
+must_not_claim:
+  - hidden chain-of-thought
+  - private provider reasoning
+  - independent truth of model answers
+  - events the platform never exposed

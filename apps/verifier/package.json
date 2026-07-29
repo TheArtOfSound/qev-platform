@@ -1,0 +1,31 @@
+{
+  "name": "@imagineqira/qev-verifier",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "qev-verify": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "tsx src/cli.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "lint": "echo ok"
+  },
+  "dependencies": {
+    "@imagineqira/qev-core": "workspace:*",
+    "@imagineqira/qev-evidence-bundle": "workspace:*",
+    "@imagineqira/qev-event-schema": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "tsx": "^4.19.2",
+    "vitest": "^2.1.8"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/cli.js",
+      "default": "./dist/cli.js"
+    }
+  }
+}

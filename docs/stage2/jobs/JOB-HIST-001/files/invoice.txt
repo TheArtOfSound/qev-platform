@@ -1,0 +1,4 @@
+INVOICE (REDACTED TEMPLATE)
+Customer: Customer A
+Amount range: 1500-2000
+Payment method: not included

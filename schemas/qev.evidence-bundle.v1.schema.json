@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://imagineqira.com/schemas/qev.evidence-bundle.v1.schema.json",
+  "title": "QEV-EVIDENCE-BUNDLE-V1",
+  "description": "Enterprise evidence package. Separate from BRY-NFET-SX-VAULT-V2. The vault envelope wraps this plaintext (or a streaming ciphertext of attachments).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "package_id",
+    "created_at",
+    "tenant_id",
+    "flow_id",
+    "case_id",
+    "events",
+    "summary",
+    "known_gaps",
+    "integrity"
+  ],
+  "properties": {
+    "schema": {
+      "const": "QEV-EVIDENCE-BUNDLE-V1"
+    },
+    "package_id": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "tenant_id": { "type": "string" },
+    "flow_id": { "type": "string" },
+    "case_id": { "type": "string" },
+    "flow_pack_version": { "type": "string" },
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "qev.event.v1.schema.json" }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event_count", "outcome", "questions"],
+      "properties": {
+        "event_count": { "type": "integer", "minimum": 1 },
+        "outcome": {
+          "type": "string",
+          "enum": ["complete", "incomplete", "blocked", "failed"]
+        },
+        "title": { "type": "string" },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "question", "answerable"],
+            "properties": {
+              "id": { "type": "string" },
+              "question": { "type": "string" },
+              "answerable": { "type": "boolean" },
+              "evidence_event_ids": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "note": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "sha256"],
+        "properties": {
+          "name": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "media_type": { "type": "string" },
+          "size_bytes": { "type": "integer" },
+          "external_ref": { "type": "string" },
+          "encrypted_chunk_manifest": { "type": "string" }
+        }
+      }
+    },
+    "policy_decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["policy_id", "policy_version", "effect", "event_id"],
+        "properties": {
+          "policy_id": { "type": "string" },
+          "policy_version": { "type": "string" },
+          "effect": { "type": "string" },
+          "reason": { "type": "string" },
+          "event_id": { "type": "string" },
+          "decided_at": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "known_gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" },
+          "severity": {
+            "type": "string",
+            "enum": ["info", "warning", "critical"]
+          }
+        }
+      }
+    },
+    "access_policy": {
+      "type": "object",
+      "properties": {
+        "retention": { "type": "string" },
+        "authorized_roles": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "legal_hold": { "type": "boolean" }
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["events_sha256", "bundle_sha256"],
+      "properties": {
+        "events_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "bundle_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Hash of the bundle with integrity.bundle_sha256 set to empty string during computation."
+        },
+        "algorithm": {
+          "const": "SHA-256"
+        }
+      }
+    },
+    "package_signature": {
+      "type": "object",
+      "description": "Optional org signature over integrity.bundle_sha256.",
+      "properties": {
+        "algorithm": { "type": "string" },
+        "key_id": { "type": "string" },
+        "signature": { "type": "string" }
+      }
+    }
+  }
+}

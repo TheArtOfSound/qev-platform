@@ -1,0 +1,14 @@
+id: legal-engagement
+version: 0.0.1
+title: Legal Agreement and Matter Evidence
+status: planned
+description: Matter-bound packages with firm-controlled storage and role-gated unlock.
+connectors_planned:
+  - clio
+  - microsoft-graph
+  - docusign
+  - file-watch
+boundary: >
+  QEV preserves confidentiality controls and evidence. It does not automatically
+  create attorney-client privilege, guarantee admissibility, or satisfy every
+  legal-ethics requirement.

@@ -1,0 +1,30 @@
+{
+  "name": "@imagineqira/qev-gateway",
+  "version": "0.2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "lint": "echo ok"
+  },
+  "dependencies": {
+    "@imagineqira/qev-core": "workspace:*",
+    "@imagineqira/qev-event-schema": "workspace:*",
+    "@imagineqira/qev-evidence-bundle": "workspace:*",
+    "@imagineqira/qev-policy-engine": "workspace:*",
+    "@imagineqira/qev-shared": "workspace:*",
+    "@imagineqira/qev-connector-sdk": "workspace:*",
+    "@imagineqira/qev-runtime": "workspace:*",
+    "@imagineqira/qev-trust": "workspace:*",
+    "@imagineqira/qev-ops": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8",
+    "tsx": "^4.19.2"
+  }
+}

@@ -1,0 +1,17 @@
+node_modules/
+**/dist/
+*.tsbuildinfo
+.DS_Store
+.env
+.env.local
+.env.production
+*.log
+.demo-out/
+coverage/
+.turbo/
+data/**
+!data/packages/
+!data/packages/.gitkeep
+public-site/.indexnow-key
+# IndexNow public key files are published on the web host, not required in git
+public-site/[a-f0-9][a-f0-9]*.txt

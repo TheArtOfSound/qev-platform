@@ -1,0 +1,58 @@
+{
+  "case_id": "JOB-HIST-001",
+  "title": "Water heater replacement (synthetic-historical template)",
+  "customer_label": "Customer A",
+  "notes": "Template job — replace files and dates with redacted real archive when ready.",
+  "actions": [
+    {
+      "action": "job.created",
+      "at": "2026-03-01T14:00:00.000Z",
+      "actor": "office@redacted.local",
+      "payload": { "service": "water_heater", "customer_label": "Customer A" }
+    },
+    {
+      "action": "estimate.prepared",
+      "at": "2026-03-01T15:30:00.000Z",
+      "actor": "office@redacted.local",
+      "payload": { "amount_range": "1500-2000" }
+    },
+    {
+      "action": "estimate.approved",
+      "at": "2026-03-02T10:00:00.000Z",
+      "actor": "customer-a@redacted.local"
+    },
+    {
+      "action": "evidence.before_captured",
+      "at": "2026-03-05T09:00:00.000Z",
+      "actor": "tech@redacted.local",
+      "file": "files/before-1.txt"
+    },
+    {
+      "action": "work.started",
+      "at": "2026-03-05T09:15:00.000Z",
+      "actor": "tech@redacted.local"
+    },
+    {
+      "action": "work.completed",
+      "at": "2026-03-05T16:00:00.000Z",
+      "actor": "tech@redacted.local"
+    },
+    {
+      "action": "evidence.after_captured",
+      "at": "2026-03-05T16:10:00.000Z",
+      "actor": "tech@redacted.local",
+      "file": "files/after-1.txt"
+    },
+    {
+      "action": "invoice.issued",
+      "at": "2026-03-06T09:00:00.000Z",
+      "actor": "office@redacted.local",
+      "file": "files/invoice.txt"
+    }
+  ],
+  "questions_for_reviewer": [
+    "Can you explain the job without calling the office?",
+    "Is anything missing that would matter in a disagreement?",
+    "Is anything still too identifiable?"
+  ]
+}

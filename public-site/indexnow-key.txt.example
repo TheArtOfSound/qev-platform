@@ -1,0 +1,5 @@
+# Rename to your IndexNow key filename after generating a key:
+#   e.g. a1b2c3d4e5f6....txt  (content = the key string only)
+# Place at: https://secure.imagineqira.com/<key>.txt
+# See scripts/indexnow-submit.mjs
+REPLACE_WITH_INDEXNOW_KEY

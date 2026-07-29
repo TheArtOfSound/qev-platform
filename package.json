@@ -1,0 +1,30 @@
+{
+  "name": "qev-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "QEV commercial platform: customer-controlled gateway, SDKs, connectors, evidence bundles",
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "build": "pnpm -r --filter './packages/*' build && pnpm -r --filter './apps/*' build",
+    "dev:gateway": "pnpm --filter @imagineqira/qev-gateway dev",
+    "start:gateway": "pnpm --filter @imagineqira/qev-gateway start",
+    "verify": "tsx apps/verifier/src/cli.ts",
+    "test": "pnpm -r --filter './packages/*' test && pnpm --filter @imagineqira/qev-gateway test",
+    "typecheck": "pnpm -r typecheck",
+    "demo:vertical": "tsx scripts/demo-vertical-slice.ts",
+    "pilot:synthetic": "tsx scripts/synthetic-field-service.ts",
+    "pilot": "pnpm dev:gateway",
+    "stage2:import": "tsx scripts/stage2-import.ts",
+    "install:pilot": "bash scripts/install-pilot.sh",
+    "lint": "pnpm -r lint --if-present"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

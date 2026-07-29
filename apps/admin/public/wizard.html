@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QEV Setup Wizard</title>
+  <link rel="stylesheet" href="assets/app.css" />
+</head>
+<body>
+  <header class="top">
+    <div>
+      <a href="./" class="back">← Home</a>
+      <h1>Setup wizard</h1>
+      <p class="sub">Under 15 minutes · No JSON editing required</p>
+    </div>
+  </header>
+
+  <main class="wizard">
+    <nav class="steps" id="steps"></nav>
+    <div class="panel" id="step-panel"></div>
+    <div class="actions">
+      <button type="button" id="prev" class="ghost">Back</button>
+      <button type="button" id="next" class="primary">Continue</button>
+    </div>
+  </main>
+  <script type="module" src="assets/wizard.js"></script>
+</body>
+</html>

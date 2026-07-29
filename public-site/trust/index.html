@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QEV Trust Program — Verifiable, Narrow, Revocable</title>
+  <meta name="description" content="QEV trust badges link to signed certificates with exact workflow scope, expiration, and revocation. Badge images prove nothing by themselves." />
+  <link rel="canonical" href="https://secure.imagineqira.com/trust/" />
+  <meta property="og:title" content="QEV Trust Program" />
+  <meta property="og:description" content="Scoped workflow certificates — not company-wide security badges." />
+  <meta property="og:url" content="https://secure.imagineqira.com/trust/" />
+  <meta property="og:type" content="website" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "QEV Trust Program",
+    "url": "https://secure.imagineqira.com/trust/",
+    "isPartOf": { "@type": "WebSite", "name": "QEV", "url": "https://secure.imagineqira.com/" },
+    "description": "Verifiable workflow trust certificates with scope, expiration, and revocation."
+  }
+  </script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; color: #0f1419; }
+    h1 { font-size: 1.6rem; }
+    .warn { background: #fff8e6; border-left: 4px solid #e6b84d; padding: 0.75rem 1rem; }
+    .ok { background: #eefaf3; border-left: 4px solid #3ecf8e; padding: 0.75rem 1rem; }
+    code { background: #f0f2f5; padding: 0.1rem 0.35rem; border-radius: 4px; }
+    a { color: #0b6bcb; }
+  </style>
+</head>
+<body>
+  <nav><a href="/">QEV</a> · Trust</nav>
+  <h1>QEV Trust Program</h1>
+  <p class="warn"><strong>Important:</strong> A badge graphic proves nothing. Only a <em>linked signed certificate</em> with live status is the trust object. Badges are scoped to a named workflow — never “the whole company is secure.”</p>
+
+  <h2>Two trust objects</h2>
+  <ol>
+    <li><strong>Evidence-package seal</strong> — per sealed package (hash, signatures, completeness, gaps).</li>
+    <li><strong>Company workflow certificate</strong> — exact assessed workflow only, with expiration and revocation.</li>
+  </ol>
+
+  <h2>Levels</h2>
+  <ol>
+    <li><strong>QEV Compatible</strong> — format / interoperability tests.</li>
+    <li><strong>QEV Verified Workflow</strong> — configuration baseline (not yet public-issuable at scale).</li>
+    <li><strong>QEV Protected Workflow</strong> — continuous controls (not yet issuable).</li>
+    <li><strong>QEV Independently Assessed</strong> — external firm (not yet issuable).</li>
+  </ol>
+
+  <p class="ok">Today’s public product is a <strong>controlled-use preview</strong>: no formal third-party audit, no KMS/HSM, no formal key rotation/revocation. Therefore only <strong>Compatible</strong> and internal <strong>Pilot Configuration Passed</strong> may be issued from the gateway pilot tooling.</p>
+
+  <h2>Example scope text</h2>
+  <p>Allowed wording:</p>
+  <blockquote>QEV Pilot Configuration Passed — Field-service estimates, approvals, job photos, change orders, invoices, and completion records.</blockquote>
+  <p>Not allowed:</p>
+  <blockquote>Example Co is QEV Protected / fully secure.</blockquote>
+
+  <h2>Verify a certificate</h2>
+  <p>Public records will live at <code>/trust/certificates/&lt;id&gt;/</code> with machine-readable JSON. Pilot gateway exposes <code>/v1/certificates/&lt;id&gt;</code> on customer-controlled instances.</p>
+
+  <p><a href="/security/">Security &amp; audit status</a> · <a href="/field-service-evidence/">Field service evidence</a></p>
+</body>
+</html>
