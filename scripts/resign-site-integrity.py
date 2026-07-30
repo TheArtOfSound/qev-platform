@@ -135,7 +135,7 @@ def patch_verify_html(root: Path, record: dict) -> None:
       <pre id="integrity-record" style="display:block; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 16px; font-size: 0.82rem; color: var(--text-secondary); overflow-x: auto; white-space: pre-wrap; word-break: break-all; overflow-wrap: anywhere; max-height: 500px;">{summary_json}</pre>
       <div id="integrity-error" style="display:none; color: var(--amber-text);">Could not refresh the integrity record. Server-rendered summary is shown above; download /site-integrity.json for the full signed manifest.</div>'''
     pattern = re.compile(
-        r'<div id="integrity-loading">.*?</div>\s*'
+        r'<div id="integrity-loading"[^>]*>.*?</div>\s*'
         r'<pre id="integrity-record"[^>]*>.*?</pre>\s*'
         r'<div id="integrity-error"[^>]*>.*?</div>',
         re.DOTALL,
