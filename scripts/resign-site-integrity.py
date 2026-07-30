@@ -141,14 +141,28 @@ def patch_verify_html(root: Path, record: dict) -> None:
         re.DOTALL,
     )
     if not pattern.search(html):
-        print("warn: verify.html block not matched; leaving page unchanged")
-        return
+        # Do NOT warn-and-continue. Silently leaving the page unpatched
+        # ships a /verify with the loading state visible and the
+        # server-rendered summary hidden, so a JS-disabled reader sees
+        # "Loading integrity record..." forever. That is the exact F-007
+        # regression this function exists to prevent, and a warning in a
+        # deploy log is not enough to catch it.
+        raise SystemExit(
+            "resign: verify.html integrity block did not match.\n"
+            "  The markup changed and this patch would be skipped, shipping\n"
+            "  an unpatched /verify. Fix the markup or this pattern, then\n"
+            "  re-run. Expected, in order and adjacent:\n"
+            "    <div id=\"integrity-loading\" ...>...</div>\n"
+            "    <pre id=\"integrity-record\" ...>...</pre>\n"
+            "    <div id=\"integrity-error\" ...>...</div>"
+        )
     html = pattern.sub(new_block, html, count=1)
-    html = html.replace(
-        "document.getElementById('integrity-error').style.display = 'block';",
-        "document.getElementById('integrity-error').style.display = 'block';\n"
-        "    // Keep server-rendered summary visible (F-007)",
-    )
+    if "Keep server-rendered summary visible (F-007)" not in html:
+        html = html.replace(
+            "document.getElementById('integrity-error').style.display = 'block';",
+            "document.getElementById('integrity-error').style.display = 'block';\n"
+            "    // Keep server-rendered summary visible (F-007)",
+        )
     path.write_text(html, encoding="utf-8")
     print("patched verify.html")
 
