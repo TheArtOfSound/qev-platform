@@ -4,30 +4,106 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>QEV Connectors</title>
-  <meta name="description" content="QEV connectors capture selected evidence from webhooks, files, portals, and SDKs." />
+  <meta name="description" content="Per-connector status for QEV: which connectors actually run in the pilot gateway today, which are only planned, and how to verify the list yourself." />
   <link rel="canonical" href="https://secure.imagineqira.com/connectors/" />
   <meta property="og:title" content="QEV Connectors" />
-  <meta property="og:description" content="QEV connectors capture selected evidence from webhooks, files, portals, and SDKs." />
+  <meta property="og:description" content="Per-connector status for QEV: which connectors actually run in the pilot gateway today, which are only planned, and how to verify the list yourself." />
   <meta property="og:url" content="https://secure.imagineqira.com/connectors/" />
   <meta property="og:type" content="website" />
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"WebPage","name":"QEV Connectors","url":"https://secure.imagineqira.com/connectors/","description":"QEV connectors capture selected evidence from webhooks, files, portals, and SDKs.","isPartOf":{"@type":"WebSite","name":"QEV","url":"https://secure.imagineqira.com/"},"dateModified":"2026-07-29"}
+  {"@context":"https://schema.org","@type":"WebPage","name":"QEV Connectors","url":"https://secure.imagineqira.com/connectors/","description":"Per-connector status for QEV: which connectors actually run in the pilot gateway today, which are only planned, and how to verify the list yourself.","isPartOf":{"@type":"WebSite","name":"QEV","url":"https://secure.imagineqira.com/"},"dateModified":"2026-07-29"}
   </script>
   <style>
     body{font-family:system-ui,sans-serif;max-width:720px;margin:2rem auto;padding:0 1rem;line-height:1.55;color:#0f1419}
     .badge{display:inline-block;font-size:.75rem;padding:.2rem .5rem;border-radius:999px;background:#eef2f6}
     .live{background:#e8f8ef}.planned{background:#fff6e0}
     a{color:#0b6bcb} pre{background:#f4f6f8;padding:1rem;overflow:auto;font-size:.85rem}
+    code{background:#f0f2f5;padding:.1rem .35rem;border-radius:4px;font-size:.85em}
+    table{width:100%;border-collapse:collapse;font-size:.88rem;margin:1rem 0}
+    th,td{border:1px solid #d0d7de;padding:.5rem .6rem;text-align:left;vertical-align:top}
+    th{background:#f4f6f8}
+    .a{background:#e8f8ef}.p{background:#fff6e0}.x{background:#fdecea}.pl{background:#eef2f6}
+    .note{background:#f6f8fa;border-left:4px solid #0969da;padding:.75rem 1rem;margin:1rem 0}
   </style>
 </head>
 <body>
   <nav><a href="/">QEV</a> · <a href="/platform/">Platform</a> · <a href="/trust/">Trust</a></nav>
-  <p><span class="badge live">live</span></p>
+  <p><span class="badge live">3 connectors run in the pilot</span></p>
   <h1>Connectors</h1>
   <p>Normalize vendor events into <code>qev.event.v1</code> for the customer-controlled gateway.</p>
-<ul><li><strong>Live (pilot):</strong> signed webhook, job portal, photo/file, local file-watch</li>
-<li><strong>Planned:</strong> OAuth Drive/M365, OTLP, GitHub, Clio, DocuSign</li></ul>
-<p><a href="/platform/">Live pilot gateway</a> · <a href="https://github.com/TheArtOfSound/qev-platform">GitHub</a></p>
+
+  <p>Labels are the same ones used on <a href="/status/">/status/</a>:
+    <strong>Available</strong> — works today on a public or pilot surface ·
+    <strong>Preview</strong> — controlled use, limited trust model, not enterprise-hardened ·
+    <strong>Planned</strong> — designed or scaffolded, not ready for production claims ·
+    <strong>Not assessed</strong> — no independent third-party security audit.
+    A directory existing in the monorepo is <em>not</em> the same as a connector running.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Connector</th>
+        <th scope="col">Label</th>
+        <th scope="col">What is true today</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>generic_webhook</code></td>
+        <td class="a">Available (pilot)</td>
+        <td>Signed HTTP webhooks into <code>POST /v1/webhooks/{connector_id}</code>, HMAC-SHA256 over the raw body. Reported by the pilot gateway as enabled and healthy.</td>
+      </tr>
+      <tr>
+        <td><code>job_portal</code></td>
+        <td class="a">Available (pilot)</td>
+        <td>Job/work-order events from the pilot portal path. Reported by the pilot gateway as enabled and healthy.</td>
+      </tr>
+      <tr>
+        <td><code>photo_file</code></td>
+        <td class="a">Available (pilot)</td>
+        <td>Photo and document artifacts attached to a case. Reported by the pilot gateway as enabled and healthy.</td>
+      </tr>
+      <tr>
+        <td>Local folder watch (<code>file-watch</code>)</td>
+        <td class="p">Preview</td>
+        <td>Not a separate connector — it is an option on <code>photo_file</code>, switched on by setting <code>watch_dir</code> in gateway settings. Implemented in the monorepo, but the hosted pilot's health response does not report a watch directory, so do not assume it is switched on there.</td>
+      </tr>
+      <tr>
+        <td><code>github</code></td>
+        <td class="pl">Planned</td>
+        <td>Directory and README exist in the monorepo and the README says “planned.” No connector is registered in the gateway and the pilot does not list it. Not usable in a pilot today.</td>
+      </tr>
+      <tr>
+        <td><code>otlp</code></td>
+        <td class="pl">Planned</td>
+        <td>Directory and README exist in the monorepo and the README says “planned.” No connector is registered in the gateway and the pilot does not list it. Not usable in a pilot today.</td>
+      </tr>
+      <tr>
+        <td>OAuth Drive / M365, Clio, DocuSign</td>
+        <td class="pl">Planned</td>
+        <td>Named in flow definitions only. No connector code in the monorepo.</td>
+      </tr>
+      <tr>
+        <td>Connector certification harness</td>
+        <td class="pl">Planned</td>
+        <td>An engineering-backlog item for testing connector releases. It is not a connector and not a capture path — do not count it as one.</td>
+      </tr>
+      <tr>
+        <td>Independent security assessment of any connector</td>
+        <td class="x">Not assessed</td>
+        <td>None completed — see <a href="/audit-status/">Audit status</a>.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <strong>Check the list yourself before sizing a pilot.</strong><br>
+    The hosted pilot gateway publishes its own connector list:<br>
+    <code>curl -s https://secure.imagineqira.com/platform/v1/health</code><br>
+    Read the <code>connectors</code> object in the response. <strong>Only connectors listed there exist on that instance.</strong> Anything on this page not labelled <strong>Available</strong> cannot carry pilot scope. The same response reports the instance <code>mode</code> and whether capture is <code>enabled</code>; in shadow mode the gateway records alongside normal operations and never controls or blocks a business process.
+  </div>
+
+<p><a href="/platform/">Live pilot gateway</a> · <a href="/status/">Status &amp; version matrix</a> · <a href="https://github.com/TheArtOfSound/qev-platform">GitHub</a></p>
   <p style="margin-top:2rem;font-size:.9rem;color:#556">Stronger trust marks require assessment — <a href="/trust/">Trust program</a> · <a href="/audit-status/">Audit status</a>.</p>
 </body>
 </html>

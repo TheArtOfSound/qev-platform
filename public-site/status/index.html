@@ -39,7 +39,7 @@
     <strong>Product hierarchy (one stack)</strong><br>
     <strong>1. Envelope Core</strong> — portable Vault V2 (browser, desktop, CLI)<br>
     <strong>2. Capture Gateway</strong> — customer-controlled event → package pipeline<br>
-    <strong>3. Connectors</strong> — webhook, portal, photo/file, file-watch (more planned)<br>
+    <strong>3. Connectors</strong> — signed webhook, job portal, photo/file (optional local folder watch); more planned — see <a href="/connectors/">/connectors/</a> for the per-connector label<br>
     <strong>4. Flow Packs</strong> — Field Service (pilot); AI/legal/devops packs planned<br>
     <strong>5. Verify</strong> — multi-verdict package review + seal certificates<br>
     <strong>6. Control Plane</strong> — optional; not required for local pilot · no customer plaintext
@@ -47,7 +47,7 @@
 
   <h2>Capability labels</h2>
   <table>
-    <thead><tr><th>Label</th><th>Meaning</th></tr></thead>
+    <thead><tr><th scope="col">Label</th><th scope="col">Meaning</th></tr></thead>
     <tbody>
       <tr><td class="a"><strong>Available</strong></td><td>Works today on a public or pilot surface</td></tr>
       <tr><td class="p"><strong>Preview</strong></td><td>Controlled-use; limited trust model; not enterprise-hardened</td></tr>
@@ -60,20 +60,20 @@
   <table>
     <thead>
       <tr>
-        <th>Component</th>
-        <th>Version</th>
-        <th>Status</th>
-        <th>Tests (source)</th>
-        <th>Vault V2</th>
-        <th>Evidence Bundle V1</th>
+        <th scope="col">Component</th>
+        <th scope="col">Version</th>
+        <th scope="col">Status</th>
+        <th scope="col">Tests (source)</th>
+        <th scope="col">Vault V2</th>
+        <th scope="col">Evidence Bundle V1</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td>Product preview demo (site /app history)</td>
-        <td>0.29.0</td>
-        <td class="p">Preview</td>
-        <td><strong>258</strong> (220 product + 38 vault-tool) — as published on main product page</td>
+        <td>Product demo (formerly <code>/app</code> on this host)</td>
+        <td>0.29.0 (last version served here)</td>
+        <td class="p">Preview · not on this host</td>
+        <td>No count published — no reproducible source. See <a href="#counts">Why test counts differ</a>.</td>
         <td>—</td>
         <td>—</td>
       </tr>
@@ -81,7 +81,7 @@
         <td>Desktop / mobile apps (downloads)</td>
         <td>0.29.0</td>
         <td class="p">Preview · unsigned installers</td>
-        <td><strong>362</strong> — download-page claim for that binary pipeline; different suite from the 258 product tests</td>
+        <td>No count published — no reproducible source. Closest checkable source is the <code>cargo test</code> step in <code>.github/workflows/qev-build.yml</code> in <a href="https://github.com/TheArtOfSound/qev-desktop">qev-desktop</a>; that step does not publish a case total.</td>
         <td class="a">R/W</td>
         <td class="pl">Planned open</td>
       </tr>
@@ -89,7 +89,7 @@
         <td>CLI npm package</td>
         <td>0.30.0</td>
         <td class="a">Available</td>
-        <td>Built-in <code>qev self-test</code> + package <code>node --test</code> suite (historically documented as ~26 cases — not the same as 258/362)</td>
+        <td>Built-in <code>qev self-test</code> + package <code>node --test</code> suite — reproducible: <code>npm i -g @bryan237l/qev-cli &amp;&amp; qev self-test</code>. Its own suite only; not comparable to any other row.</td>
         <td class="a">R/W</td>
         <td class="pl">Planned</td>
       </tr>
@@ -97,7 +97,7 @@
         <td>Browser vault <code>/vault</code></td>
         <td>0.29.x / V2 format</td>
         <td class="a">Available</td>
-        <td>Included in vault-tool portion of product testing; crypto self-test in page</td>
+        <td>In-page crypto self-test only. No separately published suite for this page, so no count published.</td>
         <td class="a">R/W</td>
         <td class="x">No</td>
       </tr>
@@ -113,26 +113,43 @@
         <td>Qira Link</td>
         <td>0.1.0-alpha</td>
         <td class="pl">Sibling alpha</td>
-        <td>Separate product — not counted in QEV product 258</td>
+        <td>Separate product — never counted in any QEV component's suite</td>
         <td>—</td>
         <td>—</td>
       </tr>
     </tbody>
   </table>
 
-  <h2>Why test counts differ</h2>
-  <p>They are <strong>different codebases and suites</strong>, not “failed tests missing from the homepage.”</p>
+  <h2 id="counts">Why test counts differ</h2>
+  <p>The components are <strong>different codebases with different suites</strong>, not “failed tests missing from the homepage.” Each suite covers only its own component:</p>
   <ul>
-    <li><strong>258</strong> — product preview / policy-demo path (as stated on the main site).</li>
-    <li><strong>362</strong> — desktop binary pipeline claim on the downloads page.</li>
-    <li><strong>CLI self-test</strong> — small focused suite for the npm package only.</li>
-    <li><strong>qev-platform</strong> — separate Vitest monorepo for the commercial gateway.</li>
+    <li><strong>CLI npm package</strong> — small focused suite for the published package only. Run it yourself: <code>qev self-test</code>, or <code>node --test test/*.test.js</code> in the package.</li>
+    <li><strong>qev-platform</strong> — separate Vitest monorepo for the commercial gateway. Run it yourself: <code>pnpm test</code> in <a href="https://github.com/TheArtOfSound/qev-platform">qev-platform</a>.</li>
+    <li><strong>Desktop / mobile apps</strong> — Rust/Tauri build pipeline in <a href="https://github.com/TheArtOfSound/qev-desktop">qev-desktop</a>. Its CI runs <code>cargo test</code> but does not publish a case total.</li>
+    <li><strong>Browser vault</strong> — in-page crypto self-test only; no separate published suite.</li>
   </ul>
-  <p>Never mix these numbers into one “QEV has N tests” claim without naming the component.</p>
+  <p><strong>Never</strong> merge these into one “QEV has N tests” claim, and never add counts across components. A count is meaningless unless the component is named.</p>
+
+  <div class="note">
+    <strong>Counts withdrawn on 2026-07-29</strong><br>
+    This page previously published <strong>258</strong> (220 product + 38 vault-tool) and <strong>362</strong> and attributed them to other pages on this site. That was circular: the only support for either figure was marketing copy, and the pages cited pointed back here. Neither figure had a test run a reader could inspect, so both have been removed rather than restated. If you see 258 or 362 quoted anywhere else on this site or in older material, treat it as unsupported.
+  </div>
+
+  <div class="note">
+    <strong>What it takes to publish a count here</strong><br>
+    A number goes on this page only when all of the following exist:
+    <ul>
+      <li>a <strong>named component</strong> and the <strong>exact commit</strong> the run was made from;</li>
+      <li>a <strong>command a reader can run</strong> to reproduce it, or a <strong>publicly readable CI run</strong> whose output shows the total;</li>
+      <li>the <strong>pass/fail/skipped breakdown</strong>, not just the passing total;</li>
+      <li>a link to that run or command <em>on this page</em>, next to the number.</li>
+    </ul>
+    No number is published on the strength of another page saying it. Where those conditions are not met, this page says “no count published” — which is the current state for the desktop pipeline, the browser vault, and the product demo that is no longer on this host.
+  </div>
 
   <h2>Official package names (today)</h2>
   <table>
-    <thead><tr><th>Package</th><th>Name</th><th>Notes</th></tr></thead>
+    <thead><tr><th scope="col">Package</th><th scope="col">Name</th><th scope="col">Notes</th></tr></thead>
     <tbody>
       <tr>
         <td>CLI (published)</td>
@@ -160,6 +177,13 @@
     <li><a href="/trust/">Trust program</a> — Compatible / Pilot certs only; no Protected badge</li>
     <li><a href="/audit-status/">Audit status</a> — Not independently assessed</li>
     <li><a href="/verify">Site integrity</a> — Ed25519-signed manifest</li>
+  </ul>
+
+  <h2>What is no longer on this host</h2>
+  <ul>
+    <li><strong>Product demo</strong> — <code>/app/</code> now redirects to <a href="/vault/">/vault/</a>. There is no demo surface on this host any more. The product demo is served from GitHub Pages at
+      <a href="https://theartofsound.github.io/qev-model-intake/demo.html">theartofsound.github.io/qev-model-intake/demo.html</a> —
+      unsigned static hosting on a different origin, <strong>not</strong> covered by this host's signed integrity manifest, so <a href="/verify">/verify</a> says nothing about it.</li>
   </ul>
 
   <h2>What is not claimed</h2>
