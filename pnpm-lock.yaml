@@ -50,6 +50,9 @@ importers:
       '@imagineqira/qev-trust':
         specifier: workspace:*
         version: link:../../packages/trust
+      '@noble/ed25519':
+        specifier: 2.1.0
+        version: 2.1.0
     devDependencies:
       tsx:
         specifier: ^4.19.2

@@ -7,6 +7,13 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { createHash, timingSafeEqual } from "node:crypto";
 import {
+  entitlementForCapture,
+  licenseSummary,
+  loadLicense,
+  type CaptureAction,
+  type License,
+} from "./license.js";
+import {
   hmacSha256Hex,
   timingSafeEqualHex,
   sha256Hex,
@@ -125,6 +132,39 @@ function isDetailAuthorized(
     return { ok: false, reason: "Invalid Bearer token" };
   }
   return { ok: true };
+}
+
+
+/**
+ * Capture gate. See license.ts for why this only ever guards capture.
+ *
+ * Returns null when the request may proceed, or a 402 response body when it
+ * may not. 402 rather than 403: this is a commercial limit, not a security
+ * decision, and the distinction matters to anyone reading logs.
+ */
+let cachedLicense: License | null | undefined;
+async function gateCapture(
+  action: CaptureAction,
+  dataDir: string,
+  usage: { packages: number; cases: number },
+  res: ServerResponse,
+): Promise<boolean> {
+  if (cachedLicense === undefined) {
+    cachedLicense = await loadLicense(path.join(dataDir, "license.json"));
+  }
+  const ent = await entitlementForCapture(action, cachedLicense, usage);
+  if (ent.allowed) return true;
+  json(res, 402, {
+    error: "capture_not_entitled",
+    action,
+    tier: ent.tier,
+    reason: ent.reason,
+    remedy: ent.remedy,
+    evidence_access:
+      "Unaffected. Every package already sealed remains readable, verifiable and " +
+      "exportable with your own keys. This limit applies to new capture only.",
+  });
+  return false;
 }
 
 function parseSignature(header: string | undefined): string | null {
@@ -708,6 +748,13 @@ export function createGateway(
             // the gateway believes it can operate, without describing
             // its internals.
             healthy: pf.critical_failures === 0,
+            // Entitlement state is deliberately public: a customer should be
+            // able to see what tier they are on without a token, and it
+            // contains no secret.
+            entitlement: licenseSummary(
+              cachedLicense ?? null,
+              { packages: (await store.listPackages()).length, cases: store.listCases().length },
+            ),
             detail: "authenticate with a Bearer token for the full report",
             plaintext_to_qira: false,
           });
@@ -730,6 +777,10 @@ export function createGateway(
           cases: store.listCases().length,
           packages: (await store.listPackages()).length,
           requires_human_confirmation: REQUIRES_HUMAN_CONFIRMATION,
+          entitlement: licenseSummary(
+            cachedLicense ?? null,
+            { packages: (await store.listPackages()).length, cases: store.listCases().length },
+          ),
           plaintext_to_qira: false,
         });
       }
@@ -976,6 +1027,9 @@ export function createGateway(
 
       // Job portal: create lifecycle events without raw YAML
       if (method === "POST" && url.pathname === "/v1/portal/events") {
+        // Capture is gateable; reading evidence is not. See license.ts.
+        if (!(await gateCapture("portal_event", config.dataDir,
+              { packages: (await store.listPackages()).length, cases: store.listCases().length }, res))) return;
         const rawBuf = await readBody(req);
         const body = JSON.parse(rawBuf.toString("utf8")) as {
           case_id: string;
@@ -1026,6 +1080,9 @@ export function createGateway(
 
       // Photo / file upload (base64 for pilot simplicity)
       if (method === "POST" && url.pathname === "/v1/photos") {
+        // Capture is gateable; reading evidence is not. See license.ts.
+        if (!(await gateCapture("upload_photo", config.dataDir,
+              { packages: (await store.listPackages()).length, cases: store.listCases().length }, res))) return;
         const rawBuf = await readBody(req);
         const body = JSON.parse(rawBuf.toString("utf8")) as {
           case_id: string;
@@ -1100,6 +1157,9 @@ export function createGateway(
       }
 
       if (method === "POST" && url.pathname === "/v1/events") {
+        // Capture is gateable; reading evidence is not. See license.ts.
+        if (!(await gateCapture("ingest_event", config.dataDir,
+              { packages: (await store.listPackages()).length, cases: store.listCases().length }, res))) return;
         const rawBuf = await readBody(req);
         const parsed = JSON.parse(rawBuf.toString("utf8")) as {
           event: QevEventV1;

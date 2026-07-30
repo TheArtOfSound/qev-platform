@@ -20,7 +20,8 @@
     "@imagineqira/qev-connector-sdk": "workspace:*",
     "@imagineqira/qev-runtime": "workspace:*",
     "@imagineqira/qev-trust": "workspace:*",
-    "@imagineqira/qev-ops": "workspace:*"
+    "@imagineqira/qev-ops": "workspace:*",
+    "@noble/ed25519": "2.1.0"
   },
   "devDependencies": {
     "typescript": "^5.7.3",
