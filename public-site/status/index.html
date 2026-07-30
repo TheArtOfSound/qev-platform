@@ -89,7 +89,7 @@
         <td>CLI npm package</td>
         <td>0.30.0</td>
         <td class="a">Available</td>
-        <td>Built-in <code>qev self-test</code> + package <code>node --test</code> suite — reproducible: <code>npm i -g @bryan237l/qev-cli &amp;&amp; qev self-test</code>. Its own suite only; not comparable to any other row.</td>
+        <td><strong>28 tests passing</strong>, plus 7 checks in the built-in self-test. Measured 2026-07-29, not estimated. Reproduce: <code>npm i -g @bryan237l/qev-cli &amp;&amp; qev self-test</code>, or from a checkout <code>cd qev-cli &amp;&amp; npm ci &amp;&amp; npm test</code>. This suite only; not comparable to any other row.</td>
         <td class="a">R/W</td>
         <td class="pl">Planned</td>
       </tr>
@@ -105,7 +105,7 @@
         <td>qev-platform gateway</td>
         <td>0.3.x pilot</td>
         <td class="p">Preview pilot</td>
-        <td>Monorepo Vitest (packages + gateway) — run <code>pnpm test</code> in <a href="https://github.com/TheArtOfSound/qev-platform">qev-platform</a>; count is CI-generated, not hand-edited on marketing pages</td>
+        <td><strong>36 tests passing across 9 suites</strong> (8 package suites + the gateway suite). Measured 2026-07-29, not estimated. Reproduce from a checkout of <a href="https://github.com/TheArtOfSound/qev-platform">qev-platform</a>: <code>pnpm install &amp;&amp; pnpm build &amp;&amp; pnpm test</code>. Includes coverage that the detailed health report is authenticated and fails closed on the shipped default token.</td>
         <td class="a">Seals via V2</td>
         <td class="a">Write/verify</td>
       </tr>
