@@ -5,7 +5,7 @@ import {
 } from "node:http";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
-import { createHash } from "node:crypto";
+import { createHash, timingSafeEqual } from "node:crypto";
 import {
   hmacSha256Hex,
   timingSafeEqualHex,
@@ -92,6 +92,41 @@ function parseAuth(req: IncomingMessage): string | null {
   return m?.[1] ?? null;
 }
 
+/**
+ * Gate for endpoints that expose internal posture.
+ *
+ * The 2026-07-29 audit found GET /v1/health served the gateway's entire
+ * internal state to anyone: every preflight check and its detail strings,
+ * the connector inventory, the org signing key_id, queue depths, case-log
+ * state and the human-confirmation policy list. robots.txt disallowed the
+ * path, but robots is not an access control and that file says so itself.
+ *
+ * Fails closed on purpose. A gateway still running the shipped default
+ * token is treated as unconfigured, not as authorised - otherwise the
+ * "protection" is a published constant.
+ */
+function isDetailAuthorized(
+  req: IncomingMessage,
+  ingestToken: string,
+): { ok: true } | { ok: false; reason: string } {
+  if (!ingestToken || ingestToken === "dev-ingest-token-change-me") {
+    return {
+      ok: false,
+      reason:
+        "Detailed health is disabled because QEV_INGEST_TOKEN is unset or still the shipped default. Set a real token to enable it.",
+    };
+  }
+  const token = parseAuth(req);
+  if (!token) return { ok: false, reason: "Missing Bearer token" };
+  const a = Buffer.from(token);
+  const b = Buffer.from(ingestToken);
+  // Length must match before timingSafeEqual, which throws on mismatch.
+  if (a.length !== b.length || !timingSafeEqual(a, b)) {
+    return { ok: false, reason: "Invalid Bearer token" };
+  }
+  return { ok: true };
+}
+
 function parseSignature(header: string | undefined): string | null {
   if (!header) return null;
   const m = /^sha256=([a-f0-9]+)$/i.exec(header.trim());
@@ -99,6 +134,15 @@ function parseSignature(header: string | undefined): string | null {
   if (/^[a-f0-9]{64}$/i.test(header.trim())) return header.trim().toLowerCase();
   return null;
 }
+
+/**
+ * Single source of truth for the version this gateway reports.
+ *
+ * The audit found /healthz reporting "0.2.0-pilot" while /v1/health on the
+ * same process reported "0.3.0-seamless-p0". Two endpoints on one binary
+ * must not disagree about what they are.
+ */
+const GATEWAY_VERSION = "0.3.0-seamless-p0";
 
 const MIME: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -561,7 +605,7 @@ export function createGateway(
         return json(res, 200, {
           status: "ok",
           product: "qev-gateway",
-          version: "0.2.0-pilot",
+          version: GATEWAY_VERSION,
           claims: "liveness only — not a security proof",
         });
       }
@@ -637,18 +681,44 @@ export function createGateway(
         return json(res, 200, saved);
       }
 
+      // Preflight detail names internal paths and configuration state.
+      // Authenticated only.
       if (method === "GET" && url.pathname === "/v1/preflight") {
+        const auth = isDetailAuthorized(req, config.ingestToken);
+        if (!auth.ok) return unauthorized(res, auth.reason);
         return json(res, 200, await buildPreflightReport());
       }
 
       if (method === "GET" && url.pathname === "/v1/health") {
         const settings = await settingsStore.load();
+        const auth = isDetailAuthorized(req, config.ingestToken);
+
+        // Public view: enough for an uptime check or a load balancer to
+        // route on, and nothing that describes how this gateway is
+        // configured. No preflight detail, no connector inventory, no
+        // key ids, no queue depths, no case/package counts.
+        if (!auth.ok) {
+          const pf = await buildPreflightReport();
+          return json(res, 200, {
+            product: "qev-gateway",
+            version: GATEWAY_VERSION,
+            mode: normalizeMode(settings.mode),
+            enabled: settings.enabled,
+            // A boolean roll-up, not the per-check detail. Says whether
+            // the gateway believes it can operate, without describing
+            // its internals.
+            healthy: pf.critical_failures === 0,
+            detail: "authenticate with a Bearer token for the full report",
+            plaintext_to_qira: false,
+          });
+        }
+
         const pf = await buildPreflightReport();
         const q = await queue.stats();
         const chain = await caseLog.verifyChain();
         return json(res, 200, {
           product: "qev-gateway",
-          version: "0.3.0-seamless-p0",
+          version: GATEWAY_VERSION,
           mode: normalizeMode(settings.mode),
           mode_behavior: MODE_BEHAVIORS[normalizeMode(settings.mode)],
           enabled: settings.enabled,
