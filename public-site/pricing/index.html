@@ -1,30 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>QEV pricing</title>
-  <meta name="description" content="Pilot available; commercial packaging TBD. Packages remain customer-owned." />
-  <link rel="canonical" href="https://secure.imagineqira.com/pricing/" />
-  <meta property="og:title" content="QEV pricing" />
-  <meta property="og:description" content="Pilot available; commercial packaging TBD. Packages remain customer-owned." />
-  <meta property="og:url" content="https://secure.imagineqira.com/pricing/" />
-  <meta property="og:type" content="website" />
-  <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"WebPage","name":"QEV pricing","url":"https://secure.imagineqira.com/pricing/","description":"Pilot available; commercial packaging TBD. Packages remain customer-owned.","isPartOf":{"@type":"WebSite","name":"QEV","url":"https://secure.imagineqira.com/"},"dateModified":"2026-07-29"}
-  </script>
-  <style>
-    body{font-family:system-ui,sans-serif;max-width:720px;margin:2rem auto;padding:0 1rem;line-height:1.55;color:#0f1419}
-    .badge{display:inline-block;font-size:.75rem;padding:.2rem .5rem;border-radius:999px;background:#eef2f6}
-    .live{background:#e8f8ef}.planned{background:#fff6e0}
-    a{color:#0b6bcb} pre{background:#f4f6f8;padding:1rem;overflow:auto;font-size:.85rem}
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QEV Pricing — Free vault tools &amp; team pilot</title>
+  <meta name="description" content="Free offline vault tools. Team pilot for the capture gateway. Commercial list pricing not yet published. You keep your keys and packages.">
+  <link rel="canonical" href="https://secure.imagineqira.com/pricing/">
+  <meta property="og:title" content="QEV pricing">
+  <meta property="og:description" content="Free vault tools. Team pilot available. Packages remain customer-owned.">
+  <meta property="og:url" content="https://secure.imagineqira.com/pricing/">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="/styles.css?v=0.30.0">
 </head>
 <body>
-  <nav><a href="/">QEV</a> · <a href="/platform/">Platform</a> · <a href="/trust/">Trust</a></nav>
-  <p><span class="badge planned">planned</span></p>
-  <h1>Pricing</h1>
-  <p>Pilot/evaluation tools are available. Commercial open-core pricing not yet published. Owned packages remain openable with customer keys after subscription ends (product principle).</p>
-  <p style="margin-top:2rem;font-size:.9rem;color:#556">Stronger trust marks require assessment — <a href="/trust/">Trust program</a> · <a href="/audit-status/">Audit status</a>.</p>
+<nav>
+  <div class="wrap">
+    <a href="/" class="logo">QEV</a>
+    <div class="nav-links">
+      <a href="/#paths">Get started</a>
+      <a href="/docs/">Docs</a>
+      <a href="/pricing/">Pricing</a>
+      <a href="/downloads">Download</a>
+      <a href="/trust/">Trust</a>
+      <a href="/vault" class="btn btn-sm btn-primary">Start free</a>
+    </div>
+  </div>
+</nav>
+
+<header class="page-header">
+  <div class="wrap">
+    <div class="label">Pricing</div>
+    <h1>Start free. Pilot when you need capture.</h1>
+    <p class="page-desc">No paywall on the offline vault. Team gateway is pilot-priced by conversation until list rates publish.</p>
+  </div>
+</header>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="g3">
+      <div class="card path-card">
+        <div class="card-label">Free forever</div>
+        <h3>Vault tools</h3>
+        <p>Browser vault, desktop apps, and CLI for sealing and opening packages on your devices.</p>
+        <ul>
+          <li>No account required</li>
+          <li>No QEV cloud that can read your plaintext</li>
+          <li>You keep the files and the keys</li>
+        </ul>
+        <a href="/vault" class="btn btn-sm btn-primary">Start free</a>
+        <a href="/downloads" class="btn btn-sm btn-outline" style="margin-left:8px">Download</a>
+      </div>
+      <div class="card path-card path-card-featured">
+        <div class="card-label">Pilot</div>
+        <h3>Team capture</h3>
+        <p>Customer-controlled gateway, connectors, and evidence bundles for workflow sealing.</p>
+        <ul>
+          <li>Scoped pilot with your environment</li>
+          <li>Support for integration and review</li>
+          <li>Commercial list pricing not published yet</li>
+        </ul>
+        <a href="mailto:bryanleonard@imagineqira.com?subject=QEV%20Team%20Pilot%20Pricing" class="btn btn-sm btn-primary">Talk about pilot</a>
+      </div>
+      <div class="card path-card">
+        <div class="card-label">Principle</div>
+        <h3>You own the packages</h3>
+        <p>Even if you later stop a subscription, packages sealed with your keys remain openable with those keys. We do not hold a hostage master key for your vault files.</p>
+        <a href="/trust/" class="btn btn-sm btn-outline">Trust program</a>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:28px">
+      <h3>What is not included yet</h3>
+      <p style="color:var(--text-secondary);font-size:0.9rem;margin-top:8px">Enterprise multi-tenant SaaS hosting of your plaintext, formal third-party audit certificates, KMS/HSM product SKUs, and published open-core seat pricing. See <a href="/audit-status/">audit status</a>.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    QEV pricing · <a href="/">Home</a> · <a href="/docs/">Docs</a> · <a href="/contact">Contact</a><br>
+    &copy; 2026 <a href="https://imagineqira.com">Qira LLC</a>
+  </div>
+</footer>
+
+<script src="/site-verify.js?v=2026-04-19"
+        integrity="sha384-3WqDGwnBC4ShR6woVWkzUPVZe7SP/w7VRWnc4ysY1Xa7yQfFuwfIPk1eWe46fvCM"
+        crossorigin="anonymous"></script>
 </body>
 </html>

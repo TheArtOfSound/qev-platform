@@ -1,37 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>QEV Status, Versions &amp; Test Matrix</title>
-  <meta name="description" content="Single source of truth for QEV product hierarchy, versions, test counts by component, and capability labels. Generated for Gate A honesty." />
-  <link rel="canonical" href="https://secure.imagineqira.com/status/" />
-  <meta property="og:title" content="QEV Status &amp; Test Matrix" />
-  <meta property="og:url" content="https://secure.imagineqira.com/status/" />
-  <meta name="robots" content="index,follow" />
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": "QEV Status and Test Matrix",
-    "url": "https://secure.imagineqira.com/status/",
-    "dateModified": "2026-07-29",
-    "isPartOf": {"@type":"WebSite","name":"QEV","url":"https://secure.imagineqira.com/"}
-  }
-  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QEV Status, Versions & Test Matrix</title>
+  <meta name="description" content="Single source of truth for QEV product hierarchy, versions, test counts by component, and capability labels.">
+  <link rel="canonical" href="https://secure.imagineqira.com/status/">
+  <meta property="og:title" content="QEV Status, Versions & Test Matrix">
+  <meta property="og:url" content="https://secure.imagineqira.com/status/">
+  <meta name="robots" content="index,follow">
+  <link rel="stylesheet" href="/styles.css?v=0.30.0">
   <style>
-    body{font-family:system-ui,sans-serif;max-width:860px;margin:2rem auto;padding:0 1rem;line-height:1.5;color:#0f1419}
     table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0}
-    th,td{border:1px solid #d0d7de;padding:.5rem .6rem;text-align:left;vertical-align:top}
-    th{background:#f4f6f8}
-    .a{background:#e8f8ef}.p{background:#fff6e0}.x{background:#fdecea}.pl{background:#eef2f6}
-    code{background:#f0f2f5;padding:.1rem .35rem;border-radius:4px;font-size:.85em}
-    a{color:#0b6bcb}
-    .note{background:#f6f8fa;border-left:4px solid #0969da;padding:.75rem 1rem;margin:1rem 0}
+    th,td{border:1px solid var(--border);padding:.5rem .6rem;text-align:left;vertical-align:top}
+    th{background:var(--surface)}
+    .a{background:var(--green-bg)}.p{background:var(--amber-bg)}.x{background:#fdecea}.pl{background:var(--surface)}
+    .note{background:var(--surface);border-left:4px solid var(--accent);padding:.75rem 1rem;margin:1rem 0;font-size:.92rem;color:var(--text-secondary)}
+    .status-body{max-width:900px}
+    .status-body h1{font-size:clamp(1.5rem,3vw,1.9rem);margin:0 0 12px}
+    .status-body h2{font-size:1.15rem;margin:28px 0 10px}
+    .status-body p,.status-body li{color:var(--text-secondary);font-size:.92rem}
   </style>
 </head>
 <body>
-  <nav><a href="/">QEV</a> · Status · <a href="/platform/">Platform</a> · <a href="/trust/">Trust</a></nav>
+<nav>
+  <div class="wrap">
+    <a href="/" class="logo">QEV</a>
+    <div class="nav-links">
+      <a href="/#paths">Get started</a>
+      <a href="/docs/">Docs</a>
+      <a href="/pricing/">Pricing</a>
+      <a href="/downloads">Download</a>
+      <a href="/trust/">Trust</a>
+      <a href="/vault" class="btn btn-sm btn-primary">Start free</a>
+    </div>
+  </div>
+</nav>
+<section style="padding:48px 0 64px">
+  <div class="wrap status-body">
+
+  
   <h1>QEV status, versions &amp; test matrix</h1>
   <p><strong>Last updated:</strong> 2026-07-29 · <strong>Purpose:</strong> one place for versions and test counts so marketing pages never invent numbers.</p>
 
@@ -175,5 +183,15 @@
     Source of this page: <a href="https://github.com/TheArtOfSound/qev-platform">qev-platform</a> ·
     Gate A honesty · Update when versions change · Do not hand-edit counts on marketing pages without updating this matrix.
   </p>
+
+  </div>
+</section>
+<footer>
+  <div class="wrap">
+    QEV status · <a href="/docs/">Docs</a> · <a href="/trust/">Trust</a> · <a href="/verify">Site Integrity</a><br>
+    &copy; 2026 <a href="https://imagineqira.com">Qira LLC</a>
+  </div>
+</footer>
+<script src="/site-verify.js?v=2026-04-19" integrity="sha384-3WqDGwnBC4ShR6woVWkzUPVZe7SP/w7VRWnc4ysY1Xa7yQfFuwfIPk1eWe46fvCM" crossorigin="anonymous"></script>
 </body>
 </html>
