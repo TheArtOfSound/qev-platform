@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Master URL list for secure.imagineqira.com.
+  Rules for this file:
+   - one entry per page, in the exact form that returns 200 (no entry that redirects);
+   - never list both the bare and trailing-slash form of the same path;
+   - the URL here must match that page's rel=canonical.
+  sitemap-pages.xml / sitemap-docs.xml / sitemap-trust.xml are priority subsets of this
+  list for search-console reporting; they must not contain a URL that is absent here.
+-->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://secure.imagineqira.com/</loc><lastmod>2026-07-29</lastmod></url>
   <url><loc>https://secure.imagineqira.com/about/</loc><lastmod>2026-07-29</lastmod></url>
@@ -8,7 +17,6 @@
   <url><loc>https://secure.imagineqira.com/changelog/</loc><lastmod>2026-07-29</lastmod></url>
   <url><loc>https://secure.imagineqira.com/confidential-investigations/</loc><lastmod>2026-07-29</lastmod></url>
   <url><loc>https://secure.imagineqira.com/connectors/</loc><lastmod>2026-07-29</lastmod></url>
-  <url><loc>https://secure.imagineqira.com/contact</loc><lastmod>2026-07-29</lastmod></url>
   <url><loc>https://secure.imagineqira.com/contact/</loc><lastmod>2026-07-29</lastmod></url>
   <url><loc>https://secure.imagineqira.com/devops-change-evidence/</loc><lastmod>2026-07-29</lastmod></url>
   <url><loc>https://secure.imagineqira.com/docs/</loc><lastmod>2026-07-29</lastmod></url>
@@ -23,7 +31,6 @@
   <url><loc>https://secure.imagineqira.com/platform/</loc><lastmod>2026-07-29</lastmod></url>
   <url><loc>https://secure.imagineqira.com/pricing/</loc><lastmod>2026-07-29</lastmod></url>
   <url><loc>https://secure.imagineqira.com/privacy</loc><lastmod>2026-07-29</lastmod></url>
-  <url><loc>https://secure.imagineqira.com/review</loc><lastmod>2026-07-29</lastmod></url>
   <url><loc>https://secure.imagineqira.com/sdk/</loc><lastmod>2026-07-29</lastmod></url>
   <url><loc>https://secure.imagineqira.com/security</loc><lastmod>2026-07-29</lastmod></url>
   <url><loc>https://secure.imagineqira.com/threat-model/</loc><lastmod>2026-07-29</lastmod></url>

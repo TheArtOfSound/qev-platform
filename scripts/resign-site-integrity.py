@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
 """Re-sign production secure.imagineqira.com content tree.
 
+Produces site-integrity.json in the format expected by site-verify.js:
+  - signer.public_key_hex (must match PINNED_SIGNER_PUBKEY_HEX in site-verify.js)
+  - signature.algorithm = "ed25519"
+  - signature.signature_hex (hex-encoded ed25519 sig)
+  - Signed bytes = domain || canonical_json(manifest without signature)
+  - canonical JSON = json.dumps(..., sort_keys=True, separators=(',', ':'),
+                                 ensure_ascii=False)
+
 Usage (from a checkout that has the private key):
   python3 scripts/resign-site-integrity.py \
     --site-root /path/to/webroot \
     --key /path/to/site-signer.ed25519.key
 
-Produces site-integrity.json in the site root and patches verify.html
-so the integrity record is server-rendered (F-007 fix).
+Also patches verify.html so the integrity summary is server-rendered (F-007).
 """
 from __future__ import annotations
 
@@ -24,6 +31,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 SIGNATURE_DOMAIN = b"BRY-NFET-SX|SITE-INTEGRITY|V2"
+SIGNATURE_SCHEME = "ed25519"
 EXCLUDE_NAMES = {
     "site-integrity.json",
     ".DS_Store",
@@ -46,7 +54,6 @@ def should_include(rel: str) -> bool:
         return False
     if name.startswith("google") and name.endswith(".html"):
         return False
-    # package binaries can be large; still should be hashed if present under downloads
     return True
 
 
@@ -81,12 +88,29 @@ def public_hex(priv: Ed25519PrivateKey) -> str:
     return raw.hex()
 
 
-def sign_manifest(priv: Ed25519PrivateKey, body: dict) -> str:
-    # Canonical JSON without signature field
-    payload = json.dumps(body, indent=2, sort_keys=True).encode("utf-8")
-    msg = SIGNATURE_DOMAIN + b"\n" + payload
-    sig = priv.sign(msg)
-    return base64.b64encode(sig).decode("ascii")
+def canonical_manifest_bytes(manifest: dict) -> bytes:
+    """Minified sorted JSON — must match site-verify.js canonicalJsonBytes."""
+    return json.dumps(
+        manifest,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    ).encode("utf-8")
+
+
+def sign_manifest(priv: Ed25519PrivateKey, manifest: dict) -> str:
+    """Return hex-encoded ed25519 signature over domain || canonical JSON.
+
+    Manifest must NOT include a `signature` field (site-verify.js deletes it
+    before verifying).
+    """
+    if "signature" in manifest:
+        raise ValueError("manifest must not include signature when signing")
+    signed_bytes = SIGNATURE_DOMAIN + canonical_manifest_bytes(manifest)
+    sig = priv.sign(signed_bytes)
+    # self-check
+    priv.public_key().verify(sig, signed_bytes)
+    return sig.hex()
 
 
 def patch_verify_html(root: Path, record: dict) -> None:
@@ -95,40 +119,93 @@ def patch_verify_html(root: Path, record: dict) -> None:
         print("warn: verify.html missing")
         return
     html = path.read_text(encoding="utf-8")
+    signer = record.get("signer") or {}
+    sig = record.get("signature") or {}
     summary = {
         "schema": record.get("schema"),
         "site": record.get("site"),
         "signed_at": record.get("signed_at"),
         "file_count": record.get("file_count"),
-        "public_key": record.get("public_key") or record.get("signer_public_key"),
-        "signature_scheme": record.get("signature", {}).get("scheme")
-        if isinstance(record.get("signature"), dict)
-        else record.get("signature_scheme"),
+        "public_key": signer.get("public_key_hex") or record.get("public_key"),
+        "signature_scheme": sig.get("algorithm") or sig.get("scheme"),
         "note": "Server-rendered summary. Full record at /site-integrity.json",
     }
     summary_json = json.dumps(summary, indent=2)
-    # Replace loading/error default state with server-rendered pre content
     new_block = f'''      <div id="integrity-loading" style="display:none">Loading integrity record...</div>
       <pre id="integrity-record" style="display:block; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 16px; font-size: 0.82rem; color: var(--text-secondary); overflow-x: auto; white-space: pre-wrap; word-break: break-all; overflow-wrap: anywhere; max-height: 500px;">{summary_json}</pre>
       <div id="integrity-error" style="display:none; color: var(--amber-text);">Could not refresh the integrity record. Server-rendered summary is shown above; download /site-integrity.json for the full signed manifest.</div>'''
     pattern = re.compile(
-        r'<div id="integrity-loading">.*?</div>\s*'
+        r'<div id="integrity-loading"[^>]*>.*?</div>\s*'
         r'<pre id="integrity-record"[^>]*>.*?</pre>\s*'
         r'<div id="integrity-error"[^>]*>.*?</div>',
         re.DOTALL,
     )
     if not pattern.search(html):
-        print("warn: verify.html block not matched; leaving page unchanged")
-        return
+        # Do NOT warn-and-continue. Silently leaving the page unpatched
+        # ships a /verify with the loading state visible and the
+        # server-rendered summary hidden, so a JS-disabled reader sees
+        # "Loading integrity record..." forever. That is the exact F-007
+        # regression this function exists to prevent, and a warning in a
+        # deploy log is not enough to catch it.
+        raise SystemExit(
+            "resign: verify.html integrity block did not match.\n"
+            "  The markup changed and this patch would be skipped, shipping\n"
+            "  an unpatched /verify. Fix the markup or this pattern, then\n"
+            "  re-run. Expected, in order and adjacent:\n"
+            "    <div id=\"integrity-loading\" ...>...</div>\n"
+            "    <pre id=\"integrity-record\" ...>...</pre>\n"
+            "    <div id=\"integrity-error\" ...>...</div>"
+        )
     html = pattern.sub(new_block, html, count=1)
-    # Improve fetch script to keep server-rendered content on failure
-    html = html.replace(
-        "document.getElementById('integrity-error').style.display = 'block';",
-        "document.getElementById('integrity-error').style.display = 'block';\n"
-        "    // Keep server-rendered summary visible (F-007)",
-    )
+    if "Keep server-rendered summary visible (F-007)" not in html:
+        html = html.replace(
+            "document.getElementById('integrity-error').style.display = 'block';",
+            "document.getElementById('integrity-error').style.display = 'block';\n"
+            "    // Keep server-rendered summary visible (F-007)",
+        )
     path.write_text(html, encoding="utf-8")
     print("patched verify.html")
+
+
+def build_record(
+    priv: Ed25519PrivateKey,
+    site_name: str,
+    file_hashes: dict[str, str],
+) -> dict:
+    pub = public_hex(priv)
+    manifest = {
+        "schema": "BRY-NFET-SX-SITE-INTEGRITY-V2",
+        "site": site_name,
+        "signed_at": datetime.now(timezone.utc).isoformat(),
+        "file_count": len(file_hashes),
+        "files": file_hashes,
+        "signer": {
+            "scheme": SIGNATURE_SCHEME,
+            "public_key_hex": pub,
+            "public_key_url": f"https://{site_name}/site-signer.ed25519.pub",
+            "domain": SIGNATURE_DOMAIN.decode("ascii"),
+        },
+    }
+    sig_hex = sign_manifest(priv, manifest)
+    return {
+        **manifest,
+        "signature": {
+            "algorithm": SIGNATURE_SCHEME,
+            "domain": SIGNATURE_DOMAIN.decode("ascii"),
+            "public_key_hex": pub,
+            "signature_hex": sig_hex,
+            "canonical_json_note": (
+                "The signed bytes are: "
+                f"{SIGNATURE_DOMAIN.decode('ascii')}"
+                "|| json.dumps(manifest_without_signature, sort_keys=True, "
+                "separators=(',', ':'), ensure_ascii=False).encode('utf-8'). "
+                "The 'manifest_without_signature' object is this record "
+                "with the 'signature' field removed. JS verifiers: "
+                "recursively sort object keys, then JSON.stringify(obj) "
+                "with no indent argument — this produces the same bytes."
+            ),
+        },
+    }
 
 
 def main() -> None:
@@ -140,48 +217,27 @@ def main() -> None:
     root = Path(args.site_root).resolve()
     priv = load_key(Path(args.key))
     pub = public_hex(priv)
+    print(f"public_key {pub}")
 
     files = collect_files(root)
     file_hashes = {rel: sha256_file(root / rel) for rel in files}
-    body = {
-        "schema": "BRY-NFET-SX-SITE-INTEGRITY-V2",
-        "site": args.site_name,
-        "signed_at": datetime.now(timezone.utc).isoformat(),
-        "file_count": len(file_hashes),
-        "files": file_hashes,
-        "public_key": pub,
-        "signature": {
-            "scheme": "ed25519",
-            "domain": "BRY-NFET-SX|SITE-INTEGRITY|V2",
-            "encoding": "base64",
-        },
-    }
-    # sign without the value field
-    sig_b64 = sign_manifest(priv, body)
-    body["signature"]["value"] = sig_b64
+    record = build_record(priv, args.site_name, file_hashes)
 
     out = root / "site-integrity.json"
-    out.write_text(json.dumps(body, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    out.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
     print(f"wrote {out} files={len(file_hashes)}")
 
-    # Patch verify, then re-hash verify.html and re-sign
-    patch_verify_html(root, body)
-    if "verify.html" in file_hashes:
+    # Patch verify, then re-hash verify.html and re-sign so hashes stay true
+    patch_verify_html(root, record)
+    if (root / "verify.html").exists():
         file_hashes["verify.html"] = sha256_file(root / "verify.html")
-        body["files"] = file_hashes
-        body["file_count"] = len(file_hashes)
-        body["signed_at"] = datetime.now(timezone.utc).isoformat()
-        # clear previous sig value for re-sign
-        body["signature"] = {
-            "scheme": "ed25519",
-            "domain": "BRY-NFET-SX|SITE-INTEGRITY|V2",
-            "encoding": "base64",
-        }
-        body["signature"]["value"] = sign_manifest(priv, body)
-        out.write_text(json.dumps(body, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        record = build_record(priv, args.site_name, file_hashes)
+        out.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
         print("re-signed after verify.html patch")
 
-    print("public_key", pub)
+    print(f"files signed: {record['file_count']}")
+    print(f"signed_at:    {record['signed_at']}")
+    print(f"sig prefix:   {record['signature']['signature_hex'][:32]}...")
 
 
 if __name__ == "__main__":
