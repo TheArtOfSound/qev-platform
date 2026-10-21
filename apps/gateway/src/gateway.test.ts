@@ -149,6 +149,13 @@ describe("gateway pilot slice", () => {
     expect(complete.status).toBe(201);
     const sealed = (await complete.json()) as { package_id: string };
 
+    const wrongPhrase = await fetch(`${baseUrl}/v1/packages/${sealed.package_id}/verify`, {
+      method: "POST", headers: {"content-type": "application/json", authorization: `Bearer ${token}`},
+      body: JSON.stringify({passphrase: "incorrect-fixture-phrase"}),
+    });
+    expect(wrongPhrase.status).toBe(422);
+    expect((await wrongPhrase.json() as {overall_ok: boolean}).overall_ok).toBe(false);
+
     const verify = await fetch(
       `${baseUrl}/v1/packages/${sealed.package_id}/verify`,
       {

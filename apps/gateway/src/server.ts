@@ -1152,8 +1152,12 @@ export function createGateway(
         };
         const pkg = await store.loadPackage(packageId);
         if (!pkg) return json(res, 404, { error: "package not found" });
-        const report = await verifyPackageFull(pkg, body.passphrase, config);
-        return json(res, 200, report);
+        try {
+          const report = await verifyPackageFull(pkg, body.passphrase, config);
+          return json(res, report.overall_ok ? 200 : 422, report);
+        } catch {
+          return json(res, 422, {overall_ok: false, error: "Package could not be verified with this passphrase and envelope"});
+        }
       }
 
       const receiptMatch = url.pathname.match(/^\/v1\/receipts\/([^/]+)$/);
