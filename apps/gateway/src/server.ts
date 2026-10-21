@@ -63,12 +63,36 @@ import { SettingsStore, type PilotSettings } from "./settings.js";
 import type { SigningKeyStore } from "./keys.js";
 
 
+class RequestError extends Error {
+  constructor(message: string, readonly status: number) { super(message); }
+}
+
+function validateStorageIds(value: unknown, depth = 0): void {
+  if (depth > 40) throw new RequestError("JSON nesting exceeds the supported limit", 400);
+  if (!value || typeof value !== "object") return;
+  for (const [key, child] of Object.entries(value)) {
+    if (["case_id", "event_id", "flow_id", "package_id", "certificate_id"].includes(key) &&
+        typeof child === "string" && (!/^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$/.test(child) || child.includes(".."))) {
+      throw new RequestError("Invalid storage identifier", 400);
+    }
+    validateStorageIds(child, depth + 1);
+  }
+}
+
 async function readBody(req: IncomingMessage): Promise<Buffer> {
+  const maxBytes = 1024 * 1024;
+  if (Number(req.headers["content-length"] || 0) > maxBytes) throw new RequestError("Request body exceeds 1 MiB", 413);
   const chunks: Buffer[] = [];
+  let length = 0;
   for await (const chunk of req) {
+    length += chunk.length;
+    if (length > maxBytes) throw new RequestError("Request body exceeds 1 MiB", 413);
     chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
   }
-  return Buffer.concat(chunks);
+  const body = Buffer.concat(chunks);
+  try { validateStorageIds(JSON.parse(body.toString("utf8"))); }
+  catch (error) { if (error instanceof RequestError) throw error; }
+  return body;
 }
 
 function json(res: ServerResponse, status: number, body: unknown): void {
@@ -535,6 +559,25 @@ export function createGateway(
         `http://${req.headers.host ?? "localhost"}`,
       );
       const method = req.method ?? "GET";
+      if (config.pathPrefix && (url.pathname === config.pathPrefix || url.pathname.startsWith(config.pathPrefix + "/"))) {
+        url.pathname = url.pathname.slice(config.pathPrefix.length) || "/";
+      }
+
+      const bearer = parseAuth(req);
+      const authenticated = bearer !== null && timingSafeEqualHex(sha256Hex(bearer), sha256Hex(config.ingestToken));
+      const signedWebhook = method === "POST" && /^\/v1\/webhooks\/[A-Za-z0-9_-]+$/.test(url.pathname);
+      if (config.requireAuth && !authenticated) {
+        if (method === "GET" && ["/healthz", "/v1/health"].includes(url.pathname)) {
+          return json(res, 200, {product: "qev-gateway", version: "0.3.1-authenticated-pilot", source_commit: /^[a-f0-9]{40}$/.test(process.env.GIT_SHA || "") ? process.env.GIT_SHA : null, status: "ok", mode: "shadow", authentication_required: true, deployment_kind: config.deploymentKind, evaluation_only: config.deploymentKind === "operator_evaluation", confidential_data_accepted: false, claims: "Liveness only; authenticated ingest, package access and preflight are separate checks."});
+        }
+        if (!signedWebhook) return unauthorized(res, "A gateway Bearer token is required");
+      }
+      try {
+        const decodedPath = decodeURIComponent(req.url?.split("?")[0] || "/");
+        if (decodedPath.includes("\\") || decodedPath.split("/").some(part => part === ".." || part === ".")) {
+          return json(res, 400, {error: "Invalid path"});
+        }
+      } catch { return json(res, 400, {error: "Invalid path encoding"}); }
 
       // Static admin / wizard / portal / review
       if (
@@ -590,8 +633,8 @@ export function createGateway(
           case_log: chain,
           connectors: settings.connectors,
           shadow_mode: settings.mode === "shadow" || config.shadowMode,
-          data_plane: "customer-controlled",
-          plaintext_to_qira: false,
+          data_plane: config.deploymentKind,
+          plaintext_to_qira: config.deploymentKind === "operator_evaluation",
         });
       }
 
@@ -603,6 +646,9 @@ export function createGateway(
       if (method === "PUT" && url.pathname === "/v1/settings") {
         const rawBuf = await readBody(req);
         const body = JSON.parse(rawBuf.toString("utf8")) as PilotSettings;
+        if (config.deploymentKind === "operator_evaluation" && (normalizeMode(body.mode) !== "shadow" || body.connectors?.photo_file?.watch_dir)) {
+          return json(res, 409, {error: "Operator evaluation supports shadow mode without host folder access"});
+        }
         // Never accept secrets into settings blob
         const cleaned = redactSecrets(body) as PilotSettings;
         void cleaned;
@@ -660,7 +706,7 @@ export function createGateway(
           cases: store.listCases().length,
           packages: (await store.listPackages()).length,
           requires_human_confirmation: REQUIRES_HUMAN_CONFIRMATION,
-          plaintext_to_qira: false,
+          plaintext_to_qira: config.deploymentKind === "operator_evaluation",
         });
       }
 
@@ -1125,11 +1171,9 @@ export function createGateway(
 
       return json(res, 404, { error: "not found" });
     } catch (e) {
-      const message = e instanceof Error ? e.message : String(e);
-      // Never echo secrets
-      return json(res, 500, {
-        error: message.replace(/passphrase|token|secret/gi, "[redacted]"),
-      });
+      if (e instanceof RequestError) return json(res, e.status, {error: e.message});
+      if (e instanceof SyntaxError || e instanceof RangeError) return json(res, 400, {error: "Invalid request"});
+      return json(res, 500, {error: "Gateway operation failed"});
     }
   });
 

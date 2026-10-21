@@ -18,6 +18,9 @@ export interface GatewayConfig {
   packagePassphrase: string;
   tenantId: string;
   shadowMode: boolean;
+  requireAuth: boolean;
+  deploymentKind: "customer_controlled" | "operator_evaluation";
+  pathPrefix: string;
 }
 
 function repoRootFromHere(): string {
@@ -35,6 +38,14 @@ function defaultDataDir(): string {
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): GatewayConfig {
+  if (env.NODE_ENV === "production") {
+    for (const name of ["QEV_WEBHOOK_SECRET", "QEV_INGEST_TOKEN", "QEV_PACKAGE_PASSPHRASE"]) {
+      if (!env[name] || env[name]!.length < 32 || /change-me|^dev-/.test(env[name]!)) {
+        throw new Error(`Production requires an explicit strong ${name}`);
+      }
+    }
+    if (!env.QEV_TENANT_ID || env.QEV_TENANT_ID === "local-dev") throw new Error("Production requires QEV_TENANT_ID");
+  }
   const dataDir = path.resolve(env.QEV_DATA_DIR ?? defaultDataDir());
   const root = repoRootFromHere();
   const adminDir = path.join(root, "apps/admin/public");
@@ -55,5 +66,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): GatewayConfig 
       env.QEV_PACKAGE_PASSPHRASE ?? "change-me-for-local-dev-only",
     tenantId: env.QEV_TENANT_ID ?? "local-dev",
     shadowMode: (env.QEV_SHADOW_MODE ?? "true") !== "false",
+    requireAuth: env.NODE_ENV === "production" || env.QEV_REQUIRE_AUTH === "true",
+    deploymentKind: env.QEV_DEPLOYMENT_KIND === "operator_evaluation" ? "operator_evaluation" : "customer_controlled",
+    pathPrefix: env.QEV_PATH_PREFIX === "/platform" ? "/platform" : "",
   };
 }

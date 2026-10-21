@@ -4,6 +4,11 @@ import type { QevEventV1 } from "@imagineqira/qev-event-schema";
 import type { PolicyDecision } from "@imagineqira/qev-policy-engine";
 import type { QevPackageFile } from "@imagineqira/qev-core";
 
+function storageId(value: string): string {
+  if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$/.test(value) || value.includes("..")) throw new RangeError("Invalid storage identifier");
+  return value;
+}
+
 export interface StoredEvent {
   event: QevEventV1;
   decision: PolicyDecision;
@@ -80,12 +85,14 @@ export class GatewayStore {
   }
 
   async saveCertificate(id: string, cert: unknown): Promise<string> {
+    storageId(id);
     const p = path.join(this.storageDir, "certificates", `${id}.json`);
     await writeFile(p, JSON.stringify(cert, null, 2), "utf8");
     return p;
   }
 
   async loadCertificate(id: string): Promise<unknown | null> {
+    storageId(id);
     try {
       const p = path.join(this.storageDir, "certificates", `${id}.json`);
       return JSON.parse(await readFile(p, "utf8"));
@@ -134,6 +141,7 @@ export class GatewayStore {
     event: QevEventV1,
     decision: PolicyDecision,
   ): Promise<{ duplicate: boolean }> {
+    storageId(event.event_id);
     if (this.eventsById.has(event.event_id)) {
       return { duplicate: true };
     }
@@ -189,6 +197,7 @@ export class GatewayStore {
   }
 
   async savePackage(pkg: QevPackageFile): Promise<string> {
+    storageId(pkg.package_id);
     this.packages.set(pkg.package_id, pkg);
     const filePath = path.join(this.storageDir, `${pkg.package_id}.qevpkg.json`);
     await writeFile(filePath, JSON.stringify(pkg, null, 2), "utf8");
@@ -201,6 +210,7 @@ export class GatewayStore {
   }
 
   async loadPackage(packageId: string): Promise<QevPackageFile | null> {
+    storageId(packageId);
     const mem = this.packages.get(packageId);
     if (mem) return mem;
     const filePath = path.join(this.storageDir, `${packageId}.qevpkg.json`);
@@ -242,6 +252,7 @@ export class GatewayStore {
   }
 
   packagePath(packageId: string): string {
+    storageId(packageId);
     return path.join(this.storageDir, `${packageId}.qevpkg.json`);
   }
 
